@@ -1,10 +1,10 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const postSchema = new mongoose.Schema(
   {
     author: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: "User",
       required: true,
     },
     content: String,
@@ -12,7 +12,7 @@ const postSchema = new mongoose.Schema(
     likes: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        ref: "User",
       },
     ],
     comments: [
@@ -20,7 +20,7 @@ const postSchema = new mongoose.Schema(
         content: String,
         user: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: 'User',
+          ref: "User",
         },
         createdAt: {
           type: Date,
@@ -32,4 +32,5 @@ const postSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-export default mongoose.model('Post', postSchema);
+const Post = mongoose.model("Post", postSchema);
+export default Post;

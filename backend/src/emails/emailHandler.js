@@ -1,9 +1,9 @@
-import { mailtrapClient, sender } from '../lib/mailtrap.js';
+import { mailtrapClient, sender } from "../lib/mailtrap.js";
 import {
   createWelcomeEmailTemplate,
   connectionAcceptedEmailTemplate,
   newCommentEmailTemplate,
-} from './emailTemplate.js';
+} from "./emailTemplate.js";
 
 export const sendWelcomeEmail = async (email, name, profileUrl) => {
   const recipients = [
@@ -16,11 +16,11 @@ export const sendWelcomeEmail = async (email, name, profileUrl) => {
     const response = await mailtrapClient.send({
       from: sender,
       to: recipients,
-      subject: 'Welcome to UnLinked!',
+      subject: "Welcome to UnLinked!",
       html: createWelcomeEmailTemplate(name, profileUrl),
-      category: 'welcome',
+      category: "welcome",
     });
-    console.log('Welcome email sent successfully.');
+    console.log("Welcome email sent successfully.");
     return response;
   } catch (error) {
     throw error;
@@ -43,15 +43,15 @@ export const sendConnectionAcceptedEmail = async (
     const response = await mailtrapClient.send({
       from: sender,
       to: recipients,
-      subject: `${senderName} accepted your connection request!`,
+      subject: `${recipientName} accepted your connection request!`,
       html: connectionAcceptedEmailTemplate(
         senderName,
         recipientName,
         profileUrl,
       ),
-      category: 'connection_accepted',
+      category: "connection_accepted",
     });
-    console.log('Connection accepted email sent successfully.');
+    console.log("Connection accepted email sent successfully.");
     return response;
   } catch (error) {
     throw error;
@@ -82,9 +82,9 @@ export const sendCommentNotificationEmail = async (
         content,
         postUrl,
       ),
-      category: 'comment_notification',
+      category: "comment_notification",
     });
-    console.log('Comment notification email sent successfully.');
+    console.log("Comment notification email sent successfully.");
     return response;
   } catch (error) {
     throw error;

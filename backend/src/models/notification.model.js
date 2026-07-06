@@ -1,24 +1,24 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const notificationSchema = new mongoose.Schema(
   {
     recipient: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: "User",
       required: true,
     },
     type: {
       type: String,
       required: true,
-      enum: ['like', 'comment', 'connectionAccepted'],
+      enum: ["like", "comment", "connectionAccepted"],
     },
     relatedUser: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: "User",
     },
     relatedPost: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Post',
+      ref: "Post",
     },
 
     read: {
@@ -29,4 +29,5 @@ const notificationSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-export default mongoose.model('Notification', notificationSchema);
+const Notification = mongoose.model("Notification", notificationSchema);
+export default Notification;

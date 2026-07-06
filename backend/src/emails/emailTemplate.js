@@ -113,11 +113,11 @@ export const connectionAcceptedEmailTemplate = (
           <tr>
             <td style="padding: 40px 30px;">
               <!-- 받는 사람 이름 출력 -->
-              <h2 style="font-size: 20px; font-weight: 700; color: #1d1d1f; margin-top: 0; margin-bottom: 16px; font-family: sans-serif;">Hi ${recipientName},</h2>
+              <h2 style="font-size: 20px; font-weight: 700; color: #1d1d1f; margin-top: 0; margin-bottom: 16px; font-family: sans-serif;">Hi ${senderName},</h2>
               
               <!-- 수락 메시지 -->
               <p style="font-size: 16px; line-height: 1.6; color: #43434f; margin-top: 0; margin-bottom: 25px; font-family: sans-serif;">
-                Great news! <strong style="color: #1d1d1f;">${senderName}</strong> has accepted your connection request on UnLinked.
+                Great news! <strong style="color: #1d1d1f;">${recipientName}</strong> has accepted your connection request on UnLinked.
               </p>
 
               <!-- 추가 안내 정보 -->
@@ -130,7 +130,7 @@ export const connectionAcceptedEmailTemplate = (
               <!-- View Profile 파란색 버튼 -->
               <div style="text-align: center; margin-bottom: 20px;">
                 <a href="${profileUrl}" style="background-color: #0A66C2; color: #ffffff !important; text-decoration: none; padding: 14px 32px; font-size: 16px; font-weight: bold; border-radius: 28px; display: inline-block; box-shadow: 0 4px 10px rgba(10, 102, 194, 0.25); font-family: sans-serif;">
-                  View ${senderName}'s Profile
+                  View ${recipientName}'s Profile
                 </a>
               </div>
             </td>
