@@ -86,7 +86,7 @@ export const updateProfile = async (req, res) => {
 
   try {
     const updatedUser = await User.findByIdAndUpdate(req.user._id, updateData, {
-      new: true,
+      returnDocument: 'after',
     }).select('-password');
     res.status(200).json(updatedUser);
   } catch (error) {

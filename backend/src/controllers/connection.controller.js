@@ -5,7 +5,7 @@ import { sendConnectionAcceptedEmail } from "../emails/emailHandler.js";
 
 export const sendConnectionRequest = async (req, res) => {
   try {
-    const { UserId: recipientId } = req.params;
+    const { userId: recipientId } = req.params;
     const senderId = req.user._id;
 
     if (senderId.toString() === recipientId.toString()) {
@@ -51,7 +51,7 @@ export const acceptConnectionRequest = async (req, res) => {
     if (!connectionRequest) {
       return res.status(404).json({ error: "Connection request not found" });
     }
-    if (connectionRequest.recipient.toString() !== req.user._id.toString()) {
+    if (connectionRequest.recipient._id.toString() !== req.user._id.toString()) {
       return res.status(403).json({ error: "Unauthorized" });
     }
     if (connectionRequest.status !== "pending") {

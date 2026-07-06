@@ -19,8 +19,8 @@ export const signup = async (req, res) => {
         .json({ message: 'Password must be at least 6 characters long' });
     }
 
-    //email, username이 모두 중복인 경우 에러 반환
-    const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+    //name, username이 모두 중복인 경우 에러 반환
+    const existingUser = await User.findOne({ $or: [{ name }, { username }] });
     if (existingUser) {
       return res.status(400).json({ message: 'User already exists' });
     }

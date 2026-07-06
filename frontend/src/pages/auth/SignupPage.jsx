@@ -1,38 +1,38 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 const SignupPage = () => {
   const [formData, setFormData] = useState({
-    name: "",
-    username: "",
-    email: "",
-    password: "",
+    name: '',
+    username: '',
+    email: '',
+    password: '',
   });
-  const [errorMsg, setErrorMsg] = useState("");
+  const [errorMsg, setErrorMsg] = useState('');
 
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
   const { mutate: signupMutate, isPending } = useMutation({
     mutationFn: async (userData) => {
-      const res = await fetch("/api/v1/auth/signup", {
-        method: "POST",
+      const res = await fetch('/api/v1/auth/signup', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(userData),
       });
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.message || "회원가입에 실패했습니다.");
+        throw new Error(data.message || '회원가입에 실패했습니다.');
       }
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["authUser"] });
-      navigate("/");
+      queryClient.invalidateQueries({ queryKey: ['authUser'] });
+      navigate('/');
     },
     onError: (err) => {
       setErrorMsg(err.message);
@@ -41,27 +41,32 @@ const SignupPage = () => {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    if (errorMsg) setErrorMsg("");
+    if (errorMsg) setErrorMsg('');
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setErrorMsg("");
-    
-    if (!formData.name || !formData.username || !formData.email || !formData.password) {
-      setErrorMsg("모든 필드를 입력해 주세요.");
+    setErrorMsg('');
+
+    if (
+      !formData.name ||
+      !formData.username ||
+      !formData.email ||
+      !formData.password
+    ) {
+      setErrorMsg('모든 필드를 입력해 주세요.');
       return;
     }
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!emailRegex.test(formData.email)) {
-      setErrorMsg("유효한 이메일 주소를 입력해 주세요.");
+      setErrorMsg('유효한 이메일 주소를 입력해 주세요.');
       return;
     }
     if (formData.password.length < 6) {
-      setErrorMsg("비밀번호는 최소 6자 이상이어야 합니다.");
+      setErrorMsg('비밀번호는 최소 6자 이상이어야 합니다.');
       return;
     }
-    
+
     signupMutate(formData);
   };
 
@@ -80,7 +85,7 @@ const SignupPage = () => {
           LinkedIn 가입하기
         </h2>
         <p className="mt-2 text-center text-sm text-slate-400">
-          이미 계정이 있으신가요?{" "}
+          이미 계정이 있으신가요?{' '}
           <Link
             to="/login"
             className="font-medium text-[#0a66c2] hover:text-[#004182] transition-colors"
@@ -129,7 +134,7 @@ const SignupPage = () => {
                   required
                   value={formData.username}
                   onChange={handleChange}
-                  placeholder="gildong123"
+                  placeholder="your username"
                   className="appearance-none block w-full px-3 py-2 border border-slate-700 rounded-lg shadow-sm placeholder-slate-500 text-white bg-slate-900/50 focus:outline-none focus:ring-2 focus:ring-[#0a66c2] focus:border-transparent transition-all sm:text-sm"
                 />
               </div>
@@ -194,7 +199,7 @@ const SignupPage = () => {
                 {isPending ? (
                   <span className="loading loading-spinner loading-xs"></span>
                 ) : (
-                  "동의 및 가입하기"
+                  '동의 및 가입하기'
                 )}
               </button>
             </div>

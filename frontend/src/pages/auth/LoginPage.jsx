@@ -1,36 +1,36 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
-    username: "",
-    password: "",
+    username: '',
+    password: '',
   });
-  const [errorMsg, setErrorMsg] = useState("");
+  const [errorMsg, setErrorMsg] = useState('');
 
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
   const { mutate: loginMutate, isPending } = useMutation({
     mutationFn: async (credentials) => {
-      const res = await fetch("/api/v1/auth/login", {
-        method: "POST",
+      const res = await fetch('/api/v1/auth/login', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(credentials),
       });
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.message || "로그인에 실패했습니다.");
+        throw new Error(data.message || '로그인에 실패했습니다.');
       }
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["authUser"] });
-      navigate("/");
+      queryClient.invalidateQueries({ queryKey: ['authUser'] });
+      navigate('/');
     },
     onError: (err) => {
       setErrorMsg(err.message);
@@ -39,15 +39,15 @@ const LoginPage = () => {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    if (errorMsg) setErrorMsg("");
+    if (errorMsg) setErrorMsg('');
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setErrorMsg("");
+    setErrorMsg('');
 
     if (!formData.username || !formData.password) {
-      setErrorMsg("사용자 아이디와 비밀번호를 모두 입력해 주세요.");
+      setErrorMsg('사용자 아이디와 비밀번호를 모두 입력해 주세요.');
       return;
     }
 
@@ -69,7 +69,7 @@ const LoginPage = () => {
           LinkedIn 로그인
         </h2>
         <p className="mt-2 text-center text-sm text-slate-400">
-          처음이신가요?{" "}
+          처음이신가요?{' '}
           <Link
             to="/signup"
             className="font-medium text-[#0a66c2] hover:text-[#004182] transition-colors"
@@ -97,7 +97,7 @@ const LoginPage = () => {
                   required
                   value={formData.username}
                   onChange={handleChange}
-                  placeholder="gildong123"
+                  placeholder="Your username"
                   className="appearance-none block w-full px-3 py-2 border border-slate-700 rounded-lg shadow-sm placeholder-slate-500 text-white bg-slate-900/50 focus:outline-none focus:ring-2 focus:ring-[#0a66c2] focus:border-transparent transition-all sm:text-sm"
                 />
               </div>
@@ -140,7 +140,7 @@ const LoginPage = () => {
                 {isPending ? (
                   <span className="loading loading-spinner loading-xs"></span>
                 ) : (
-                  "로그인"
+                  '로그인'
                 )}
               </button>
             </div>
