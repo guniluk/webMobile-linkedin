@@ -3,8 +3,11 @@ import User from '../models/user.model.js';
 
 export const protectRoute = async (req, res, next) => {
   try {
-    // 1. 쿠키에서 토큰 추출
-    const token = req.cookies['jwt-linkedin'];
+    // 1. 쿠키 또는 헤더에서 토큰 추출
+    let token = req.cookies['jwt-linkedin'];
+    if (!token && req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
+      token = req.headers.authorization.split(' ')[1];
+    }
 
     if (!token) {
       return res

@@ -95,7 +95,7 @@ const ProfilePage = () => {
           } else {
             errorMsg = errorData.message || errorMsg;
           }
-        } catch (e) {
+        } catch {
           // ignore
         }
         throw new Error(errorMsg);
@@ -581,13 +581,13 @@ const ProfilePage = () => {
             {profile.skills.map((skill, index) => (
               <span
                 key={index}
-                className="bg-slate-800 hover:bg-base-200/80 border border-base-300/60 text-base-content/80 text-xs font-semibold px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-all duration-200"
+                className="bg-base-200 hover:bg-base-300 border border-base-300/60 text-base-content/80 text-xs font-semibold px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-all duration-200"
               >
                 {skill}
                 {isOwnProfile && (
                   <button
                     onClick={() => handleRemoveSkill(skill)}
-                    className="text-base-content/40 hover:text-red-400 rounded-full hover:bg-slate-700 p-0.5 transition-colors"
+                    className="text-base-content/40 hover:text-red-400 rounded-full hover:bg-base-300 p-0.5 transition-colors"
                   >
                     <X className="w-3 h-3" />
                   </button>

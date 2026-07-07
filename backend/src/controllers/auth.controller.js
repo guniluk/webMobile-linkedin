@@ -38,8 +38,9 @@ export const signup = async (req, res) => {
     });
 
     await newUser.save();
-    generateTokenAndSendCookie(newUser._id, res);
+    const token = generateTokenAndSendCookie(newUser._id, res);
     res.status(201).json({
+      token,
       _id: newUser._id,
       name: newUser.name,
       email: newUser.email,
@@ -76,9 +77,10 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: "Invalid password" });
     }
 
-    generateTokenAndSendCookie(user._id, res);
+    const token = generateTokenAndSendCookie(user._id, res);
 
     res.status(200).json({
+      token,
       _id: user._id,
       name: user.name,
       email: user.email,
@@ -107,7 +109,10 @@ export const logout = async (req, res) => {
 
 export const getMe = async (req, res) => {
   try {
-    const token = req.cookies["jwt-linkedin"];
+    let token = req.cookies["jwt-linkedin"];
+    if (!token && req.headers.authorization && req.headers.authorization.startsWith("Bearer ")) {
+      token = req.headers.authorization.split(" ")[1];
+    }
     if (!token) {
       return res.status(200).json(null);
     }
