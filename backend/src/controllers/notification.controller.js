@@ -36,7 +36,7 @@ export const deleteNotification = async (req, res) => {
     const { notification, error } = await findAndValidateNotification(
       id,
       req.user._id,
-      "delete"
+      "delete",
     );
     if (error) {
       return res.status(error.status).json({ message: error.message });
@@ -56,7 +56,7 @@ export const markNotificationAsRead = async (req, res) => {
     const { notification, error } = await findAndValidateNotification(
       id,
       req.user._id,
-      "mark"
+      "mark",
     );
     if (error) {
       return res.status(error.status).json({ message: error.message });

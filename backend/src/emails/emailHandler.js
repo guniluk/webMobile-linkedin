@@ -16,7 +16,7 @@ export const sendWelcomeEmail = async (email, name, profileUrl) => {
     const response = await mailtrapClient.send({
       from: sender,
       to: recipients,
-      subject: "Welcome to UnLinked!",
+      subject: "Welcome to UnLinkedIn!",
       html: createWelcomeEmailTemplate(name, profileUrl),
       category: "welcome",
     });

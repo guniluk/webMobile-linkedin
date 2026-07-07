@@ -46,7 +46,15 @@ const ProfilePage = () => {
   });
 
   // 1. Fetch Current User (My Auth State)
-  const { data: authUser } = useQuery({ queryKey: ["authUser"] });
+  const { data: authUser } = useQuery({
+    queryKey: ["authUser"],
+    queryFn: async () => {
+      const res = await fetch("/api/v1/auth/me");
+      if (res.status === 401) return null;
+      if (!res.ok) throw new Error("Failed to fetch user");
+      return res.json();
+    },
+  });
   const isOwnProfile = authUser?.username === username;
 
   // 2. Fetch Target User Profile
@@ -78,7 +86,20 @@ const ProfilePage = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updatedData),
       });
-      if (!res.ok) throw new Error("프로필 업데이트 실패");
+      if (!res.ok) {
+        let errorMsg = "프로필 업데이트 실패";
+        try {
+          const errorData = await res.json();
+          if (errorData.message === "Name already exists") {
+            errorMsg = "이미 가입자 이름이 존재";
+          } else {
+            errorMsg = errorData.message || errorMsg;
+          }
+        } catch (e) {
+          // ignore
+        }
+        throw new Error(errorMsg);
+      }
       return res.json();
     },
     onSuccess: (data) => {
@@ -221,17 +242,17 @@ const ProfilePage = () => {
     return (
       <div className="flex flex-col items-center justify-center py-20 gap-3">
         <Loader2 className="w-10 h-10 animate-spin text-[#0a66c2]" />
-        <p className="text-slate-400 text-sm">프로필을 불러오는 중...</p>
+        <p className="text-base-content/60 text-sm">프로필을 불러오는 중...</p>
       </div>
     );
   }
 
   if (isError || !profile) {
     return (
-      <div className="bg-[#111827] border border-slate-800 p-8 rounded-xl flex flex-col items-center text-center gap-3 max-w-lg mx-auto">
+      <div className="bg-base-100 border border-base-300 p-8 rounded-xl flex flex-col items-center text-center gap-3 max-w-lg mx-auto">
         <X className="w-10 h-10 text-red-500" />
-        <h3 className="text-white font-semibold">사용자를 찾을 수 없습니다</h3>
-        <p className="text-slate-400 text-xs">
+        <h3 className="text-base-content font-semibold">사용자를 찾을 수 없습니다</h3>
+        <p className="text-base-content/60 text-xs">
           요청하신 프로필을 찾을 수 없습니다. 올바른 주소인지 확인해주세요.
         </p>
       </div>
@@ -241,8 +262,8 @@ const ProfilePage = () => {
   const renderConnectionButton = () => {
     if (isConnStatusLoading) {
       return (
-        <button disabled className="btn btn-sm bg-slate-800 border border-slate-700 px-4 rounded-full">
-          <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
+        <button disabled className="btn btn-sm bg-slate-800 border border-base-300 px-4 rounded-full">
+          <Loader2 className="w-4 h-4 animate-spin text-base-content/60" />
         </button>
       );
     }
@@ -266,7 +287,7 @@ const ProfilePage = () => {
         return (
           <button
             disabled
-            className="btn btn-sm bg-slate-800 text-slate-500 border border-slate-700 cursor-not-allowed flex items-center gap-1.5 px-4 rounded-full"
+            className="btn btn-sm bg-slate-800 text-base-content/40 border border-base-300 cursor-not-allowed flex items-center gap-1.5 px-4 rounded-full"
           >
             <Clock className="w-4 h-4" />
             <span>요청 대기 중</span>
@@ -284,7 +305,7 @@ const ProfilePage = () => {
             </button>
             <button
               onClick={() => rejectConnRequest(requestId)}
-              className="btn btn-sm bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 flex items-center gap-1.5 px-3 rounded-full"
+              className="btn btn-sm bg-slate-800 hover:bg-slate-700 text-base-content/80 border border-base-300 flex items-center gap-1.5 px-3 rounded-full"
             >
               <X className="w-4 h-4" />
               <span>거절</span>
@@ -309,7 +330,7 @@ const ProfilePage = () => {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       {/* 1. Header Card (Banner & Avatar & Meta) */}
-      <div className="bg-[#111827] border border-slate-800 rounded-xl overflow-hidden shadow-xl relative">
+      <div className="bg-base-100 border border-base-300 rounded-xl overflow-hidden shadow-xl relative">
         {/* Banner Area */}
         <div
           className="h-48 md:h-64 bg-cover bg-center relative"
@@ -320,7 +341,7 @@ const ProfilePage = () => {
           }}
         >
           {isOwnProfile && (
-            <label className="absolute top-4 right-4 bg-slate-900/80 hover:bg-slate-900 border border-slate-700/50 p-2 rounded-full cursor-pointer text-slate-300 hover:text-white transition-all">
+            <label className="absolute top-4 right-4 bg-slate-900/80 hover:bg-slate-900 border border-slate-700/50 p-2 rounded-full cursor-pointer text-slate-200 hover:text-white transition-all">
               <Camera className="w-4 h-4" />
               <input
                 type="file"
@@ -336,7 +357,7 @@ const ProfilePage = () => {
         <div className="px-6 pb-6 relative">
           {/* Avatar */}
           <div className="relative -mt-20 md:-mt-24 mb-4 inline-block">
-            <div className="avatar ring-4 ring-[#111827] rounded-full overflow-hidden w-32 h-32 md:w-36 md:h-36 bg-slate-800 border border-slate-700">
+            <div className="avatar ring-4 ring-base-100 rounded-full overflow-hidden w-32 h-32 md:w-36 md:h-36 bg-slate-800 border border-base-300">
               <img
                 src={
                   profile.profilePicture ||
@@ -364,17 +385,17 @@ const ProfilePage = () => {
           <div className="flex justify-between items-start flex-wrap gap-4">
             <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <h1 className="text-white font-extrabold text-xl md:text-2xl">
+                <h1 className="text-base-content font-extrabold text-xl md:text-2xl">
                   {profile.name}
                 </h1>
-                <span className="text-xs text-slate-400 bg-slate-800 px-2 py-0.5 rounded-md font-medium">
+                <span className="text-xs text-base-content/60 bg-base-200 px-2 py-0.5 rounded-md font-medium">
                   @{profile.username}
                 </span>
               </div>
-              <p className="text-slate-300 text-sm md:text-base mt-1.5 font-medium">
+              <p className="text-base-content/80 text-sm md:text-base mt-1.5 font-medium">
                 {profile.headline || "LinkedIn 회원"}
               </p>
-              <div className="flex items-center gap-1 mt-3 text-xs text-slate-400">
+              <div className="flex items-center gap-1 mt-3 text-xs text-base-content/60">
                 <MapPin className="w-3.5 h-3.5" />
                 <span>{profile.location || "위치 비공개"}</span>
               </div>
@@ -401,31 +422,31 @@ const ProfilePage = () => {
       </div>
 
       {/* 2. About Card */}
-      <div className="bg-[#111827] border border-slate-800 rounded-xl p-6 shadow-xl relative">
-        <div className="flex justify-between items-center mb-4 pb-2 border-b border-slate-800">
-          <h2 className="text-white font-bold text-base md:text-lg">소개</h2>
+      <div className="bg-base-100 border border-base-300 rounded-xl p-6 shadow-xl relative">
+        <div className="flex justify-between items-center mb-4 pb-2 border-b border-base-300">
+          <h2 className="text-base-content font-bold text-base md:text-lg">소개</h2>
           {isOwnProfile && (
             <button
               onClick={openAboutModal}
-              className="text-[#0a66c2] hover:text-[#004182] p-1.5 rounded-lg hover:bg-slate-800 transition-colors"
+              className="text-[#0a66c2] hover:text-[#004182] p-1.5 rounded-lg hover:bg-base-200 transition-colors"
             >
               <Edit2 className="w-4 h-4" />
             </button>
           )}
         </div>
-        <p className="text-slate-300 text-sm leading-relaxed whitespace-pre-wrap">
+        <p className="text-base-content/80 text-sm leading-relaxed whitespace-pre-wrap">
           {profile.about || "소개글이 없습니다. 프로필을 작성해보세요!"}
         </p>
       </div>
 
       {/* 3. Experience Card */}
-      <div className="bg-[#111827] border border-slate-800 rounded-xl p-6 shadow-xl">
-        <div className="flex justify-between items-center mb-4 pb-2 border-b border-slate-800">
-          <h2 className="text-white font-bold text-base md:text-lg">경력</h2>
+      <div className="bg-base-100 border border-base-300 rounded-xl p-6 shadow-xl">
+        <div className="flex justify-between items-center mb-4 pb-2 border-b border-base-300">
+          <h2 className="text-base-content font-bold text-base md:text-lg">경력</h2>
           {isOwnProfile && (
             <button
               onClick={() => setIsExpModalOpen(true)}
-              className="text-[#0a66c2] hover:text-[#004182] p-1.5 rounded-lg hover:bg-slate-800 transition-colors"
+              className="text-[#0a66c2] hover:text-[#004182] p-1.5 rounded-lg hover:bg-base-200 transition-colors"
             >
               <Plus className="w-5 h-5" />
             </button>
@@ -433,29 +454,29 @@ const ProfilePage = () => {
         </div>
 
         {profile.experience?.length === 0 ? (
-          <p className="text-slate-500 text-xs py-2">등록된 경력이 없습니다.</p>
+          <p className="text-base-content/40 text-xs py-2">등록된 경력이 없습니다.</p>
         ) : (
           <div className="space-y-4">
             {profile.experience.map((exp) => (
               <div
                 key={exp._id}
-                className="flex gap-3 justify-between items-start pb-4 border-b border-slate-800/40 last:border-b-0 last:pb-0"
+                className="flex gap-3 justify-between items-start pb-4 border-b border-base-300/40 last:border-b-0 last:pb-0"
               >
                 <div className="flex gap-3">
-                  <div className="bg-slate-800 p-2.5 rounded-lg text-slate-400 shrink-0">
+                  <div className="bg-slate-800 p-2.5 rounded-lg text-base-content/60 shrink-0">
                     <Briefcase className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="text-white text-sm font-semibold">{exp.title}</h3>
-                    <p className="text-slate-300 text-xs mt-0.5">{exp.company}</p>
-                    <p className="text-slate-500 text-[10px] mt-1">
+                    <h3 className="text-base-content text-sm font-semibold">{exp.title}</h3>
+                    <p className="text-base-content/80 text-xs mt-0.5">{exp.company}</p>
+                    <p className="text-base-content/40 text-[10px] mt-1">
                       {new Date(exp.startDate).toLocaleDateString()} ~{" "}
                       {exp.endDate
                         ? new Date(exp.endDate).toLocaleDateString()
                         : "재직 중"}
                     </p>
                     {exp.description && (
-                      <p className="text-slate-400 text-xs mt-2 leading-relaxed">
+                      <p className="text-base-content/60 text-xs mt-2 leading-relaxed">
                         {exp.description}
                       </p>
                     )}
@@ -465,7 +486,7 @@ const ProfilePage = () => {
                 {isOwnProfile && (
                   <button
                     onClick={() => handleRemoveExperience(exp._id)}
-                    className="text-slate-500 hover:text-red-400 p-1.5 rounded-lg hover:bg-slate-800 transition-colors"
+                    className="text-base-content/40 hover:text-red-400 p-1.5 rounded-lg hover:bg-base-200 transition-colors"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -477,13 +498,13 @@ const ProfilePage = () => {
       </div>
 
       {/* 4. Education Card */}
-      <div className="bg-[#111827] border border-slate-800 rounded-xl p-6 shadow-xl">
-        <div className="flex justify-between items-center mb-4 pb-2 border-b border-slate-800">
-          <h2 className="text-white font-bold text-base md:text-lg">학력</h2>
+      <div className="bg-base-100 border border-base-300 rounded-xl p-6 shadow-xl">
+        <div className="flex justify-between items-center mb-4 pb-2 border-b border-base-300">
+          <h2 className="text-base-content font-bold text-base md:text-lg">학력</h2>
           {isOwnProfile && (
             <button
               onClick={() => setIsEduModalOpen(true)}
-              className="text-[#0a66c2] hover:text-[#004182] p-1.5 rounded-lg hover:bg-slate-800 transition-colors"
+              className="text-[#0a66c2] hover:text-[#004182] p-1.5 rounded-lg hover:bg-base-200 transition-colors"
             >
               <Plus className="w-5 h-5" />
             </button>
@@ -491,24 +512,24 @@ const ProfilePage = () => {
         </div>
 
         {profile.education?.length === 0 ? (
-          <p className="text-slate-500 text-xs py-2">등록된 학력이 없습니다.</p>
+          <p className="text-base-content/40 text-xs py-2">등록된 학력이 없습니다.</p>
         ) : (
           <div className="space-y-4">
             {profile.education.map((edu) => (
               <div
                 key={edu._id}
-                className="flex gap-3 justify-between items-start pb-4 border-b border-slate-800/40 last:border-b-0 last:pb-0"
+                className="flex gap-3 justify-between items-start pb-4 border-b border-base-300/40 last:border-b-0 last:pb-0"
               >
                 <div className="flex gap-3">
-                  <div className="bg-slate-800 p-2.5 rounded-lg text-slate-400 shrink-0">
+                  <div className="bg-slate-800 p-2.5 rounded-lg text-base-content/60 shrink-0">
                     <GraduationCap className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="text-white text-sm font-semibold">{edu.school}</h3>
-                    <p className="text-slate-300 text-xs mt-0.5">
+                    <h3 className="text-base-content text-sm font-semibold">{edu.school}</h3>
+                    <p className="text-base-content/80 text-xs mt-0.5">
                       {edu.fieldOfStudy}
                     </p>
-                    <p className="text-slate-500 text-[10px] mt-1">
+                    <p className="text-base-content/40 text-[10px] mt-1">
                       {edu.startYear}년 ~ {edu.endYear || "재학 중"}년
                     </p>
                   </div>
@@ -517,7 +538,7 @@ const ProfilePage = () => {
                 {isOwnProfile && (
                   <button
                     onClick={() => handleRemoveEducation(edu._id)}
-                    className="text-slate-500 hover:text-red-400 p-1.5 rounded-lg hover:bg-slate-800 transition-colors"
+                    className="text-base-content/40 hover:text-red-400 p-1.5 rounded-lg hover:bg-base-200 transition-colors"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -529,9 +550,9 @@ const ProfilePage = () => {
       </div>
 
       {/* 5. Skills Card */}
-      <div className="bg-[#111827] border border-slate-800 rounded-xl p-6 shadow-xl">
-        <div className="mb-4 pb-2 border-b border-slate-800">
-          <h2 className="text-white font-bold text-base md:text-lg">기술 및 역량</h2>
+      <div className="bg-base-100 border border-base-300 rounded-xl p-6 shadow-xl">
+        <div className="mb-4 pb-2 border-b border-base-300">
+          <h2 className="text-base-content font-bold text-base md:text-lg">기술 및 역량</h2>
         </div>
 
         {isOwnProfile && (
@@ -541,7 +562,7 @@ const ProfilePage = () => {
               value={newSkill}
               onChange={(e) => setNewSkill(e.target.value)}
               placeholder="새로운 보유 기술 추가..."
-              className="flex-1 bg-[#1f2937]/50 border border-slate-800 focus:border-[#0a66c2] focus:ring-1 focus:ring-[#0a66c2] rounded-lg px-3 py-2 text-xs text-white outline-none transition-all duration-200"
+              className="flex-1 bg-base-200/50 border border-base-300 focus:border-[#0a66c2] focus:ring-1 focus:ring-[#0a66c2] rounded-lg px-3 py-2 text-xs text-base-content outline-none transition-all duration-200"
             />
             <button
               type="submit"
@@ -554,19 +575,19 @@ const ProfilePage = () => {
         )}
 
         {profile.skills?.length === 0 ? (
-          <p className="text-slate-500 text-xs py-2">등록된 기술이 없습니다.</p>
+          <p className="text-base-content/40 text-xs py-2">등록된 기술이 없습니다.</p>
         ) : (
           <div className="flex flex-wrap gap-2">
             {profile.skills.map((skill, index) => (
               <span
                 key={index}
-                className="bg-slate-800 hover:bg-slate-800/80 border border-slate-700/60 text-slate-300 text-xs font-semibold px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-all duration-200"
+                className="bg-slate-800 hover:bg-base-200/80 border border-base-300/60 text-base-content/80 text-xs font-semibold px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-all duration-200"
               >
                 {skill}
                 {isOwnProfile && (
                   <button
                     onClick={() => handleRemoveSkill(skill)}
-                    className="text-slate-500 hover:text-red-400 rounded-full hover:bg-slate-700 p-0.5 transition-colors"
+                    className="text-base-content/40 hover:text-red-400 rounded-full hover:bg-slate-700 p-0.5 transition-colors"
                   >
                     <X className="w-3 h-3" />
                   </button>
@@ -584,12 +605,12 @@ const ProfilePage = () => {
       {/* A. Info Modal (Name, Headline, Location) */}
       {isInfoModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-          <div className="bg-[#111827] border border-slate-800 rounded-xl max-w-md w-full relative shadow-2xl overflow-hidden">
-            <div className="flex justify-between items-center p-4 border-b border-slate-800 bg-[#111827]">
-              <h3 className="text-white font-bold text-sm">기본 정보 수정</h3>
+          <div className="bg-base-100 border border-base-300 rounded-xl max-w-md w-full relative shadow-2xl overflow-hidden">
+            <div className="flex justify-between items-center p-4 border-b border-base-300 bg-base-100">
+              <h3 className="text-base-content font-bold text-sm">기본 정보 수정</h3>
               <button
                 onClick={() => setIsInfoModalOpen(false)}
-                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors"
+                className="text-base-content/60 hover:text-white p-1 rounded-lg hover:bg-base-200 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -599,48 +620,48 @@ const ProfilePage = () => {
                 e.preventDefault();
                 updateProfile(infoForm);
               }}
-              className="p-4 space-y-4 text-xs font-semibold text-slate-400"
+              className="p-4 space-y-4 text-xs font-semibold text-base-content/60"
             >
               <div className="flex flex-col gap-1">
-                <label className="text-slate-300">이름</label>
+                <label className="text-base-content/80">이름</label>
                 <input
                   type="text"
                   required
                   value={infoForm.name}
                   onChange={(e) => setInfoForm({ ...infoForm, name: e.target.value })}
-                  className="w-full bg-[#1f2937]/50 border border-slate-800 focus:border-[#0a66c2] focus:ring-1 focus:ring-[#0a66c2] rounded-lg p-2.5 text-white outline-none text-xs transition-all"
+                  className="w-full bg-base-200/50 border border-base-300 focus:border-[#0a66c2] focus:ring-1 focus:ring-[#0a66c2] rounded-lg p-2.5 text-base-content outline-none text-xs transition-all"
                 />
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-slate-300">헤드라인</label>
+                <label className="text-base-content/80">헤드라인</label>
                 <input
                   type="text"
                   value={infoForm.headline}
                   onChange={(e) =>
                     setInfoForm({ ...infoForm, headline: e.target.value })
                   }
-                  className="w-full bg-[#1f2937]/50 border border-slate-800 focus:border-[#0a66c2] focus:ring-1 focus:ring-[#0a66c2] rounded-lg p-2.5 text-white outline-none text-xs transition-all"
+                  className="w-full bg-base-200/50 border border-base-300 focus:border-[#0a66c2] focus:ring-1 focus:ring-[#0a66c2] rounded-lg p-2.5 text-base-content outline-none text-xs transition-all"
                 />
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-slate-300">위치</label>
+                <label className="text-base-content/80">위치</label>
                 <input
                   type="text"
                   value={infoForm.location}
                   onChange={(e) =>
                     setInfoForm({ ...infoForm, location: e.target.value })
                   }
-                  className="w-full bg-[#1f2937]/50 border border-slate-800 focus:border-[#0a66c2] focus:ring-1 focus:ring-[#0a66c2] rounded-lg p-2.5 text-white outline-none text-xs transition-all"
+                  className="w-full bg-base-200/50 border border-base-300 focus:border-[#0a66c2] focus:ring-1 focus:ring-[#0a66c2] rounded-lg p-2.5 text-base-content outline-none text-xs transition-all"
                 />
               </div>
 
-              <div className="flex justify-end gap-2 pt-2 border-t border-slate-800">
+              <div className="flex justify-end gap-2 pt-2 border-t border-base-300">
                 <button
                   type="button"
                   onClick={() => setIsInfoModalOpen(false)}
-                  className="btn btn-sm bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-lg px-4"
+                  className="btn btn-sm bg-slate-800 hover:bg-slate-700 text-base-content/80 border border-base-300 rounded-lg px-4"
                 >
                   취소
                 </button>
@@ -661,12 +682,12 @@ const ProfilePage = () => {
       {/* B. About Modal */}
       {isAboutModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-          <div className="bg-[#111827] border border-slate-800 rounded-xl max-w-md w-full relative shadow-2xl overflow-hidden">
-            <div className="flex justify-between items-center p-4 border-b border-slate-800 bg-[#111827]">
-              <h3 className="text-white font-bold text-sm">소개 수정</h3>
+          <div className="bg-base-100 border border-base-300 rounded-xl max-w-md w-full relative shadow-2xl overflow-hidden">
+            <div className="flex justify-between items-center p-4 border-b border-base-300 bg-base-100">
+              <h3 className="text-base-content font-bold text-sm">소개 수정</h3>
               <button
                 onClick={() => setIsAboutModalOpen(false)}
-                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors"
+                className="text-base-content/60 hover:text-white p-1 rounded-lg hover:bg-base-200 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -676,22 +697,22 @@ const ProfilePage = () => {
                 e.preventDefault();
                 updateProfile({ about: aboutForm });
               }}
-              className="p-4 space-y-4 text-xs font-semibold text-slate-400"
+              className="p-4 space-y-4 text-xs font-semibold text-base-content/60"
             >
               <div className="flex flex-col gap-1">
-                <label className="text-slate-300">소개글</label>
+                <label className="text-base-content/80">소개글</label>
                 <textarea
                   value={aboutForm}
                   onChange={(e) => setAboutForm(e.target.value)}
-                  className="w-full bg-[#1f2937]/50 border border-slate-800 focus:border-[#0a66c2] focus:ring-1 focus:ring-[#0a66c2] rounded-lg p-2.5 text-white outline-none text-xs resize-none min-h-37.5 transition-all"
+                  className="w-full bg-base-200/50 border border-base-300 focus:border-[#0a66c2] focus:ring-1 focus:ring-[#0a66c2] rounded-lg p-2.5 text-base-content outline-none text-xs resize-none min-h-37.5 transition-all"
                 />
               </div>
 
-              <div className="flex justify-end gap-2 pt-2 border-t border-slate-800">
+              <div className="flex justify-end gap-2 pt-2 border-t border-base-300">
                 <button
                   type="button"
                   onClick={() => setIsAboutModalOpen(false)}
-                  className="btn btn-sm bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-lg px-4"
+                  className="btn btn-sm bg-slate-800 hover:bg-slate-700 text-base-content/80 border border-base-300 rounded-lg px-4"
                 >
                   취소
                 </button>
@@ -712,47 +733,47 @@ const ProfilePage = () => {
       {/* C. Experience Add Modal */}
       {isExpModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-          <div className="bg-[#111827] border border-slate-800 rounded-xl max-w-md w-full relative shadow-2xl overflow-hidden">
-            <div className="flex justify-between items-center p-4 border-b border-slate-800 bg-[#111827]">
-              <h3 className="text-white font-bold text-sm">경력 추가</h3>
+          <div className="bg-base-100 border border-base-300 rounded-xl max-w-md w-full relative shadow-2xl overflow-hidden">
+            <div className="flex justify-between items-center p-4 border-b border-base-300 bg-base-100">
+              <h3 className="text-base-content font-bold text-sm">경력 추가</h3>
               <button
                 onClick={() => setIsExpModalOpen(false)}
-                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors"
+                className="text-base-content/60 hover:text-white p-1 rounded-lg hover:bg-base-200 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
             <form
               onSubmit={handleAddExperience}
-              className="p-4 space-y-4 text-xs font-semibold text-slate-400"
+              className="p-4 space-y-4 text-xs font-semibold text-base-content/60"
             >
               <div className="flex flex-col gap-1">
-                <label className="text-slate-300">직무 (Title)</label>
+                <label className="text-base-content/80">직무 (Title)</label>
                 <input
                   type="text"
                   required
                   value={expForm.title}
                   onChange={(e) => setExpForm({ ...expForm, title: e.target.value })}
                   placeholder="예: 프론트엔드 개발자"
-                  className="w-full bg-[#1f2937]/50 border border-slate-800 focus:border-[#0a66c2] focus:ring-1 focus:ring-[#0a66c2] rounded-lg p-2.5 text-white outline-none text-xs transition-all"
+                  className="w-full bg-base-200/50 border border-base-300 focus:border-[#0a66c2] focus:ring-1 focus:ring-[#0a66c2] rounded-lg p-2.5 text-base-content outline-none text-xs transition-all"
                 />
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-slate-300">회사명</label>
+                <label className="text-base-content/80">회사명</label>
                 <input
                   type="text"
                   required
                   value={expForm.company}
                   onChange={(e) => setExpForm({ ...expForm, company: e.target.value })}
                   placeholder="예: Google"
-                  className="w-full bg-[#1f2937]/50 border border-slate-800 focus:border-[#0a66c2] focus:ring-1 focus:ring-[#0a66c2] rounded-lg p-2.5 text-white outline-none text-xs transition-all"
+                  className="w-full bg-base-200/50 border border-base-300 focus:border-[#0a66c2] focus:ring-1 focus:ring-[#0a66c2] rounded-lg p-2.5 text-base-content outline-none text-xs transition-all"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-1">
-                  <label className="text-slate-300">시작일</label>
+                  <label className="text-base-content/80">시작일</label>
                   <input
                     type="date"
                     required
@@ -760,39 +781,39 @@ const ProfilePage = () => {
                     onChange={(e) =>
                       setExpForm({ ...expForm, startDate: e.target.value })
                     }
-                    className="w-full bg-[#1f2937]/50 border border-slate-800 focus:border-[#0a66c2] focus:ring-1 focus:ring-[#0a66c2] rounded-lg p-2.5 text-white outline-none text-xs transition-all"
+                    className="w-full bg-base-200/50 border border-base-300 focus:border-[#0a66c2] focus:ring-1 focus:ring-[#0a66c2] rounded-lg p-2.5 text-base-content outline-none text-xs transition-all"
                   />
                 </div>
                 <div className="flex flex-col gap-1">
-                  <label className="text-slate-300">종료일 (비워둘 시 재직 중)</label>
+                  <label className="text-base-content/80">종료일 (비워둘 시 재직 중)</label>
                   <input
                     type="date"
                     value={expForm.endDate}
                     onChange={(e) =>
                       setExpForm({ ...expForm, endDate: e.target.value })
                     }
-                    className="w-full bg-[#1f2937]/50 border border-slate-800 focus:border-[#0a66c2] focus:ring-1 focus:ring-[#0a66c2] rounded-lg p-2.5 text-white outline-none text-xs transition-all"
+                    className="w-full bg-base-200/50 border border-base-300 focus:border-[#0a66c2] focus:ring-1 focus:ring-[#0a66c2] rounded-lg p-2.5 text-base-content outline-none text-xs transition-all"
                   />
                 </div>
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-slate-300">설명 (선택사항)</label>
+                <label className="text-base-content/80">설명 (선택사항)</label>
                 <textarea
                   value={expForm.description}
                   onChange={(e) =>
                     setExpForm({ ...expForm, description: e.target.value })
                   }
                   placeholder="업무 내용을 간략하게 기술하세요..."
-                  className="w-full bg-[#1f2937]/50 border border-slate-800 focus:border-[#0a66c2] focus:ring-1 focus:ring-[#0a66c2] rounded-lg p-2.5 text-white outline-none text-xs resize-none min-h-22.5 transition-all"
+                  className="w-full bg-base-200/50 border border-base-300 focus:border-[#0a66c2] focus:ring-1 focus:ring-[#0a66c2] rounded-lg p-2.5 text-base-content outline-none text-xs resize-none min-h-22.5 transition-all"
                 />
               </div>
 
-              <div className="flex justify-end gap-2 pt-2 border-t border-slate-800">
+              <div className="flex justify-end gap-2 pt-2 border-t border-base-300">
                 <button
                   type="button"
                   onClick={() => setIsExpModalOpen(false)}
-                  className="btn btn-sm bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-lg px-4"
+                  className="btn btn-sm bg-slate-800 hover:bg-slate-700 text-base-content/80 border border-base-300 rounded-lg px-4"
                 >
                   취소
                 </button>
@@ -813,34 +834,34 @@ const ProfilePage = () => {
       {/* D. Education Add Modal */}
       {isEduModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-          <div className="bg-[#111827] border border-slate-800 rounded-xl max-w-md w-full relative shadow-2xl overflow-hidden">
-            <div className="flex justify-between items-center p-4 border-b border-slate-800 bg-[#111827]">
-              <h3 className="text-white font-bold text-sm">학력 추가</h3>
+          <div className="bg-base-100 border border-base-300 rounded-xl max-w-md w-full relative shadow-2xl overflow-hidden">
+            <div className="flex justify-between items-center p-4 border-b border-base-300 bg-base-100">
+              <h3 className="text-base-content font-bold text-sm">학력 추가</h3>
               <button
                 onClick={() => setIsEduModalOpen(false)}
-                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors"
+                className="text-base-content/60 hover:text-white p-1 rounded-lg hover:bg-base-200 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
             <form
               onSubmit={handleAddEducation}
-              className="p-4 space-y-4 text-xs font-semibold text-slate-400"
+              className="p-4 space-y-4 text-xs font-semibold text-base-content/60"
             >
               <div className="flex flex-col gap-1">
-                <label className="text-slate-300">학교명</label>
+                <label className="text-base-content/80">학교명</label>
                 <input
                   type="text"
                   required
                   value={eduForm.school}
                   onChange={(e) => setEduForm({ ...eduForm, school: e.target.value })}
                   placeholder="예: 서울대학교"
-                  className="w-full bg-[#1f2937]/50 border border-slate-800 focus:border-[#0a66c2] focus:ring-1 focus:ring-[#0a66c2] rounded-lg p-2.5 text-white outline-none text-xs transition-all"
+                  className="w-full bg-base-200/50 border border-base-300 focus:border-[#0a66c2] focus:ring-1 focus:ring-[#0a66c2] rounded-lg p-2.5 text-base-content outline-none text-xs transition-all"
                 />
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-slate-300">전공 / 학과</label>
+                <label className="text-base-content/80">전공 / 학과</label>
                 <input
                   type="text"
                   required
@@ -849,13 +870,13 @@ const ProfilePage = () => {
                     setEduForm({ ...eduForm, fieldOfStudy: e.target.value })
                   }
                   placeholder="예: 컴퓨터공학과"
-                  className="w-full bg-[#1f2937]/50 border border-slate-800 focus:border-[#0a66c2] focus:ring-1 focus:ring-[#0a66c2] rounded-lg p-2.5 text-white outline-none text-xs transition-all"
+                  className="w-full bg-base-200/50 border border-base-300 focus:border-[#0a66c2] focus:ring-1 focus:ring-[#0a66c2] rounded-lg p-2.5 text-base-content outline-none text-xs transition-all"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-1">
-                  <label className="text-slate-300">입학년도</label>
+                  <label className="text-base-content/80">입학년도</label>
                   <input
                     type="number"
                     required
@@ -864,11 +885,11 @@ const ProfilePage = () => {
                       setEduForm({ ...eduForm, startYear: e.target.value })
                     }
                     placeholder="예: 2020"
-                    className="w-full bg-[#1f2937]/50 border border-slate-800 focus:border-[#0a66c2] focus:ring-1 focus:ring-[#0a66c2] rounded-lg p-2.5 text-white outline-none text-xs transition-all"
+                    className="w-full bg-base-200/50 border border-base-300 focus:border-[#0a66c2] focus:ring-1 focus:ring-[#0a66c2] rounded-lg p-2.5 text-base-content outline-none text-xs transition-all"
                   />
                 </div>
                 <div className="flex flex-col gap-1">
-                  <label className="text-slate-300">졸업년도 (또는 예정)</label>
+                  <label className="text-base-content/80">졸업년도 (또는 예정)</label>
                   <input
                     type="number"
                     value={eduForm.endYear}
@@ -876,16 +897,16 @@ const ProfilePage = () => {
                       setEduForm({ ...eduForm, endYear: e.target.value })
                     }
                     placeholder="예: 2024"
-                    className="w-full bg-[#1f2937]/50 border border-slate-800 focus:border-[#0a66c2] focus:ring-1 focus:ring-[#0a66c2] rounded-lg p-2.5 text-white outline-none text-xs transition-all"
+                    className="w-full bg-base-200/50 border border-base-300 focus:border-[#0a66c2] focus:ring-1 focus:ring-[#0a66c2] rounded-lg p-2.5 text-base-content outline-none text-xs transition-all"
                   />
                 </div>
               </div>
 
-              <div className="flex justify-end gap-2 pt-2 border-t border-slate-800">
+              <div className="flex justify-end gap-2 pt-2 border-t border-base-300">
                 <button
                   type="button"
                   onClick={() => setIsEduModalOpen(false)}
-                  className="btn btn-sm bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-lg px-4"
+                  className="btn btn-sm bg-slate-800 hover:bg-slate-700 text-base-content/80 border border-base-300 rounded-lg px-4"
                 >
                   취소
                 </button>

@@ -1,28 +1,29 @@
-import User from '../models/user.model.js';
-import bcrypt from 'bcryptjs';
-import { generateTokenAndSendCookie } from '../lib/generateTokenAndSendCookie.js';
-import { sendWelcomeEmail } from '../emails/emailHandler.js';
+import User from "../models/user.model.js";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import { generateTokenAndSendCookie } from "../lib/generateTokenAndSendCookie.js";
+import { sendWelcomeEmail } from "../emails/emailHandler.js";
 
 export const signup = async (req, res) => {
   try {
     const { name, email, password, username } = req.body;
     if (!name || !email || !password || !username) {
-      return res.status(400).json({ message: 'All fields are required' });
+      return res.status(400).json({ message: "All fields are required" });
     }
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!emailRegex.test(email)) {
-      return res.status(400).json({ message: 'Invalid email' });
+      return res.status(400).json({ message: "Invalid email" });
     }
     if (password.length < 6) {
       return res
         .status(400)
-        .json({ message: 'Password must be at least 6 characters long' });
+        .json({ message: "Password must be at least 6 characters long" });
     }
 
     //name, username이 모두 중복인 경우 에러 반환
     const existingUser = await User.findOne({ $or: [{ name }, { username }] });
     if (existingUser) {
-      return res.status(400).json({ message: 'User already exists' });
+      return res.status(400).json({ message: "User already exists" });
     }
 
     //salt 생성 후 비밀번호 해싱
@@ -50,11 +51,11 @@ export const signup = async (req, res) => {
     try {
       await sendWelcomeEmail(newUser.email, newUser.name, profileUrl);
     } catch (emailError) {
-      console.log('Error sending welcome email', emailError);
+      console.log("Error sending welcome email", emailError);
     }
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: 'Internal server error' });
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -62,17 +63,17 @@ export const login = async (req, res) => {
   try {
     const { username, password } = req.body;
     if (!username || !password) {
-      return res.status(400).json({ message: 'All fields are required' });
+      return res.status(400).json({ message: "All fields are required" });
     }
 
     const user = await User.findOne({ username });
     if (!user) {
-      return res.status(400).json({ message: 'User not found' });
+      return res.status(400).json({ message: "User not found" });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return res.status(400).json({ message: 'Invalid password' });
+      return res.status(400).json({ message: "Invalid password" });
     }
 
     generateTokenAndSendCookie(user._id, res);
@@ -85,30 +86,52 @@ export const login = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: 'Internal server error' });
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
 export const logout = async (req, res) => {
   try {
-    res.clearCookie('jwt-linkedin', {
+    res.clearCookie("jwt-linkedin", {
       httpOnly: true,
-      secure: process.env.NODE_ENV !== 'development',
-      sameSite: 'strict',
+      secure: process.env.NODE_ENV !== "development",
+      sameSite: "strict",
     });
 
-    res.status(200).json({ message: 'Logout successfully' });
+    res.status(200).json({ message: "Logout successfully" });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: 'Internal server error' });
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
 export const getMe = async (req, res) => {
   try {
-    res.status(200).json(req.user);
+    const token = req.cookies["jwt-linkedin"];
+    if (!token) {
+      return res.status(200).json(null);
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (!decoded) {
+      return res.status(200).json(null);
+    }
+
+    const user = await User.findById(decoded.userId).select("-password");
+    if (!user) {
+      return res.status(200).json(null);
+    }
+
+    res.status(200).json(user);
   } catch (error) {
-    console.log('Error in getMe controller: ', error);
-    res.status(500).json({ message: 'Internal server error' });
+    // JWT 토큰이 만료되었거나 변조된 경우 에러 처리
+    if (
+      error.name === "JsonWebTokenError" ||
+      error.name === "TokenExpiredError"
+    ) {
+      return res.status(200).json(null);
+    }
+    console.log("Error in getMe controller: ", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };

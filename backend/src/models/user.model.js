@@ -30,6 +30,7 @@ const userSchema = new mongoose.Schema(
       },
     ],
     connections: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    profileViews: { type: Number, default: 0 },
   },
   { timestamps: true },
 );

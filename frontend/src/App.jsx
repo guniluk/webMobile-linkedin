@@ -1,22 +1,36 @@
-import { Route, Routes, Navigate } from 'react-router-dom';
-import Layout from './components/Layout';
-import HomePage from './pages/HomePage';
-import LoginPage from './pages/auth/LoginPage';
-import SignupPage from './pages/auth/SignupPage';
-import LogoutPage from './pages/auth/LogoutPage';
-import ProfilePage from './pages/ProfilePage';
-import NotificationsPage from './pages/NotificationsPage';
-import ConnectionsPage from './pages/ConnectionsPage';
-import { useQuery } from '@tanstack/react-query';
+import { useState, useEffect } from "react";
+import { Route, Routes, Navigate } from "react-router-dom";
+import Layout from "./components/Layout";
+import HomePage from "./pages/HomePage";
+import LoginPage from "./pages/auth/LoginPage";
+import SignupPage from "./pages/auth/SignupPage";
+import LogoutPage from "./pages/auth/LogoutPage";
+import ProfilePage from "./pages/ProfilePage";
+import NotificationsPage from "./pages/NotificationsPage";
+import ConnectionsPage from "./pages/ConnectionsPage";
+import { useQuery } from "@tanstack/react-query";
 
 const App = () => {
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem("theme") || "dark";
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+  };
+
   const { data: authUser, isLoading } = useQuery({
-    queryKey: ['authUser'],
+    queryKey: ["authUser"],
     queryFn: async () => {
       try {
-        const res = await fetch('/api/v1/auth/me');
+        const res = await fetch("/api/v1/auth/me");
         if (res.status === 401) return null;
-        if (!res.ok) throw new Error('Failed to fetch user');
+        if (!res.ok) throw new Error("Failed to fetch user");
         return res.json();
       } catch (err) {
         console.error(err);
@@ -27,10 +41,10 @@ const App = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[#0b0f19]">
+      <div className="flex items-center justify-center min-h-screen bg-base-200">
         <div className="flex flex-col items-center gap-4">
           <span className="loading loading-ring loading-lg text-[#0a66c2]"></span>
-          <p className="text-slate-400 font-medium animate-pulse text-sm">
+          <p className="text-base-content/60 font-medium animate-pulse text-sm">
             로딩 중...
           </p>
         </div>
@@ -39,7 +53,7 @@ const App = () => {
   }
 
   return (
-    <Layout authUser={authUser}>
+    <Layout authUser={authUser} theme={theme} toggleTheme={toggleTheme}>
       <Routes>
         <Route
           path="/"

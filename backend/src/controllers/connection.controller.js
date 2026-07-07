@@ -51,7 +51,9 @@ export const acceptConnectionRequest = async (req, res) => {
     if (!connectionRequest) {
       return res.status(404).json({ error: "Connection request not found" });
     }
-    if (connectionRequest.recipient._id.toString() !== req.user._id.toString()) {
+    if (
+      connectionRequest.recipient._id.toString() !== req.user._id.toString()
+    ) {
       return res.status(403).json({ error: "Unauthorized" });
     }
     if (connectionRequest.status !== "pending") {
@@ -173,6 +175,15 @@ export const removeConnection = async (req, res) => {
     me.connections.pull(userId);
     await user.save();
     await me.save();
+
+    // 두 사용자 간의 모든 1촌 신청/수락 내역 삭제
+    await ConnectionRequest.deleteMany({
+      $or: [
+        { sender: myId, recipient: userId },
+        { sender: userId, recipient: myId },
+      ],
+    });
+
     res.status(200).json({ message: "Connection removed successfully" });
   } catch (error) {
     console.log("error in removeConnection controller: ", error);

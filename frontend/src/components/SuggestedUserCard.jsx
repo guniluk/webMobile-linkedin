@@ -30,10 +30,10 @@ const SuggestedUserCard = ({ user }) => {
   });
 
   return (
-    <div className="flex items-center justify-between p-2 rounded-lg hover:bg-slate-800/40 transition-colors duration-200 border border-transparent hover:border-slate-800">
+    <div className="flex items-center justify-between p-2 rounded-lg hover:bg-base-200 transition-colors duration-200 border border-transparent hover:border-base-300">
       <div className="flex items-center gap-2.5 min-w-0">
         <Link to={`/profile/${user.username}`} className="shrink-0">
-          <div className="avatar rounded-full bg-slate-800 overflow-hidden w-9 h-9 border border-slate-700">
+          <div className="avatar rounded-full bg-base-300 overflow-hidden w-9 h-9 border border-base-300">
             <img
               src={
                 user.profilePicture ||
@@ -48,11 +48,11 @@ const SuggestedUserCard = ({ user }) => {
         <div className="flex flex-col min-w-0">
           <Link
             to={`/profile/${user.username}`}
-            className="text-white text-xs font-semibold hover:text-[#0a66c2] hover:underline truncate"
+            className="text-base-content text-xs font-semibold hover:text-[#0a66c2] hover:underline truncate"
           >
             {user.name}
           </Link>
-          <p className="text-slate-400 text-[10px] truncate max-w-32.5">
+          <p className="text-base-content/60 text-[10px] truncate max-w-32.5">
             {user.headline || "LinkedIn 회원"}
           </p>
         </div>
@@ -62,7 +62,7 @@ const SuggestedUserCard = ({ user }) => {
         {status === "sent" ? (
           <button
             disabled
-            className="btn btn-xs bg-slate-800 text-slate-500 border border-slate-700 flex items-center gap-1 px-2 py-1 rounded-full cursor-not-allowed whitespace-nowrap text-[10px] font-semibold"
+            className="btn btn-xs bg-base-300 text-base-content/40 border border-base-300 flex items-center gap-1 px-2 py-1 rounded-full cursor-not-allowed whitespace-nowrap text-[10px] font-semibold"
           >
             <Clock className="w-3 h-3" />
             <span>대기 중</span>

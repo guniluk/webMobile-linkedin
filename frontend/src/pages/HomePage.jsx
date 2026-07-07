@@ -10,7 +10,15 @@ const HomePage = () => {
   const queryClient = useQueryClient();
 
   // 1. Fetch Current User
-  const { data: authUser } = useQuery({ queryKey: ['authUser'] });
+  const { data: authUser } = useQuery({
+    queryKey: ['authUser'],
+    queryFn: async () => {
+      const res = await fetch('/api/v1/auth/me');
+      if (res.status === 401) return null;
+      if (!res.ok) throw new Error('Failed to fetch user');
+      return res.json();
+    },
+  });
 
   // 2. Fetch Feed Posts
   const {
@@ -98,21 +106,21 @@ const HomePage = () => {
         {isPostsLoading ? (
           <div className="flex flex-col items-center justify-center py-10 gap-3">
             <Loader2 className="w-8 h-8 animate-spin text-[#0a66c2]" />
-            <p className="text-slate-400 text-sm">피드를 불러오는 중...</p>
+            <p className="text-base-content/60 text-sm">피드를 불러오는 중...</p>
           </div>
         ) : isPostsError ? (
-          <div className="bg-[#111827] border border-red-900/30 p-6 rounded-xl flex flex-col items-center text-center gap-2">
+          <div className="bg-base-100 border border-red-500/20 p-6 rounded-xl flex flex-col items-center text-center gap-2">
             <AlertCircle className="w-8 h-8 text-red-500" />
-            <h3 className="text-white font-semibold">오류 발생</h3>
-            <p className="text-slate-400 text-xs">
+            <h3 className="text-base-content font-semibold">오류 발생</h3>
+            <p className="text-base-content/60 text-xs">
               피드를 불러오지 못했습니다.
             </p>
           </div>
         ) : posts?.length === 0 ? (
-          <div className="bg-[#111827] border border-slate-800 p-8 rounded-xl flex flex-col items-center text-center gap-3">
-            <Users className="w-10 h-10 text-slate-500" />
-            <h3 className="text-white font-semibold">표시할 피드가 없습니다</h3>
-            <p className="text-slate-400 text-xs max-w-70">
+          <div className="bg-base-100 border border-base-300 p-8 rounded-xl flex flex-col items-center text-center gap-3">
+            <Users className="w-10 h-10 text-base-content/40" />
+            <h3 className="text-base-content font-semibold">표시할 피드가 없습니다</h3>
+            <p className="text-base-content/60 text-xs max-w-70">
               아직 아무도 포스팅하지 않았거나 일촌이 없습니다. 새로운 1촌을 맺어
               소식을 받아보세요!
             </p>
@@ -130,9 +138,9 @@ const HomePage = () => {
       <div className="col-span-1 lg:col-span-1 space-y-4">
         {/* Connection Requests (Only show if there are pending requests) */}
         {connectionRequests && connectionRequests.length > 0 && (
-          <div className="bg-[#111827] border border-slate-800 rounded-xl p-4 shadow-xl">
-            <div className="flex justify-between items-center mb-3 pb-2 border-b border-slate-800">
-              <h3 className="text-white font-bold text-sm">
+          <div className="bg-base-100 border border-base-300 rounded-xl p-4 shadow-xl transition-colors duration-200">
+            <div className="flex justify-between items-center mb-3 pb-2 border-b border-base-300">
+              <h3 className="text-base-content font-bold text-sm">
                 받은 1촌 요청 ({connectionRequests.length})
               </h3>
               <UserCheck className="w-4 h-4 text-emerald-500" />
@@ -141,11 +149,11 @@ const HomePage = () => {
               {connectionRequests.map((req) => (
                 <div
                   key={req._id}
-                  className="flex flex-col gap-2.5 p-3 rounded-lg bg-slate-900/50 border border-slate-800/40 hover:border-slate-700/60 transition-all duration-200"
+                  className="flex flex-col gap-2.5 p-3 rounded-lg bg-base-200 border border-base-300/40 hover:border-base-300 transition-all duration-200"
                 >
                   <div className="flex items-center gap-2.5">
                     <Link to={`/profile/${req.sender?.username}`}>
-                      <div className="avatar rounded-full bg-slate-800 overflow-hidden w-9 h-9 border border-slate-700">
+                      <div className="avatar rounded-full bg-base-300 overflow-hidden w-9 h-9 border border-base-300">
                         <img
                           src={
                             req.sender?.profilePicture ||
@@ -160,11 +168,11 @@ const HomePage = () => {
                     <div className="flex flex-col min-w-0">
                       <Link
                         to={`/profile/${req.sender?.username}`}
-                        className="text-white text-xs font-semibold hover:text-[#0a66c2] hover:underline truncate"
+                        className="text-base-content text-xs font-semibold hover:text-[#0a66c2] hover:underline truncate"
                       >
                         {req.sender?.name}
                       </Link>
-                      <p className="text-slate-400 text-[10px] truncate max-w-32.5">
+                      <p className="text-base-content/60 text-[10px] truncate max-w-32.5">
                         {req.sender?.headline || 'LinkedIn 회원'}
                       </p>
                     </div>
@@ -178,7 +186,7 @@ const HomePage = () => {
                     </button>
                     <button
                       onClick={() => rejectRequest(req._id)}
-                      className="btn btn-xs bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 flex-1 rounded-full font-semibold whitespace-nowrap shrink-0"
+                      className="btn btn-xs bg-base-200 hover:bg-base-300 text-base-content border border-base-300 flex-1 rounded-full font-semibold whitespace-nowrap shrink-0"
                     >
                       거절
                     </button>
@@ -190,10 +198,10 @@ const HomePage = () => {
         )}
 
         {/* Suggested Connections */}
-        <div className="bg-[#111827] border border-slate-800 rounded-xl p-4 shadow-xl">
-          <div className="flex justify-between items-center mb-3 pb-2 border-b border-slate-800">
-            <h3 className="text-white font-bold text-sm">인맥 추천</h3>
-            <Users className="w-4 h-4 text-slate-400" />
+        <div className="bg-base-100 border border-base-300 rounded-xl p-4 shadow-xl transition-colors duration-200">
+          <div className="flex justify-between items-center mb-3 pb-2 border-b border-base-300">
+            <h3 className="text-base-content font-bold text-sm">인맥 추천</h3>
+            <Users className="w-4 h-4 text-base-content/40" />
           </div>
 
           {isSuggestionsLoading ? (
@@ -201,7 +209,7 @@ const HomePage = () => {
               <Loader2 className="w-5 h-5 animate-spin text-[#0a66c2]" />
             </div>
           ) : suggestedUsers?.length === 0 ? (
-            <p className="text-slate-500 text-xs text-center py-4">
+            <p className="text-base-content/45 text-xs text-center py-4">
               추천할 인맥이 없습니다.
             </p>
           ) : (

@@ -71,10 +71,10 @@ const CommentSection = ({ post, authUser }) => {
   };
 
   return (
-    <div className="mt-4 pt-4 border-t border-slate-800">
+    <div className="mt-4 pt-4 border-t border-base-300 transition-colors duration-200">
       {/* Comment Form */}
       <form onSubmit={handleSubmit} className="flex gap-2 mb-4 items-center">
-        <div className="avatar rounded-full bg-slate-800 overflow-hidden w-8 h-8 border border-slate-700 shrink-0">
+        <div className="avatar rounded-full bg-base-300 overflow-hidden w-8 h-8 border border-base-300 shrink-0">
           <img
             src={
               authUser?.profilePicture ||
@@ -90,12 +90,12 @@ const CommentSection = ({ post, authUser }) => {
           value={commentText}
           onChange={(e) => setCommentText(e.target.value)}
           placeholder="댓글을 입력하세요..."
-          className="flex-1 bg-[#1f2937]/50 border border-slate-800 focus:border-[#0a66c2] focus:ring-1 focus:ring-[#0a66c2] rounded-lg px-3 py-2 text-xs text-white outline-none transition-all duration-200"
+          className="flex-1 bg-base-200/50 border border-base-300 focus:border-[#0a66c2] focus:ring-1 focus:ring-[#0a66c2] rounded-lg px-3 py-2 text-xs text-base-content outline-none transition-all duration-200 placeholder-base-content/40"
         />
         <button
           type="submit"
           disabled={isAdding || !commentText.trim()}
-          className="btn btn-sm bg-[#0a66c2] hover:bg-[#004182] disabled:bg-slate-800 disabled:text-slate-500 disabled:border-slate-800 text-white rounded-lg flex items-center border-none font-semibold transition-all duration-200"
+          className="btn btn-sm bg-[#0a66c2] hover:bg-[#004182] disabled:bg-base-300 disabled:text-base-content/30 disabled:border-base-300 text-white rounded-lg flex items-center border-none font-semibold transition-all duration-200"
         >
           {isAdding ? (
             <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -108,7 +108,7 @@ const CommentSection = ({ post, authUser }) => {
       {/* Comment List */}
       <div className="space-y-3 max-h-75 overflow-y-auto pr-1">
         {post.comments?.length === 0 ? (
-          <p className="text-slate-500 text-xs text-center py-2">
+          <p className="text-base-content/40 text-xs text-center py-2">
             첫 번째 댓글을 남겨보세요.
           </p>
         ) : (
@@ -121,10 +121,10 @@ const CommentSection = ({ post, authUser }) => {
             return (
               <div
                 key={comment._id}
-                className="flex gap-2.5 items-start p-2 rounded-lg bg-slate-900/40 border border-slate-800/30"
+                className="flex gap-2.5 items-start p-2 rounded-lg bg-base-200 border border-base-300/30 transition-colors duration-200"
               >
                 <Link to={`/profile/${comment.user?.username}`}>
-                  <div className="avatar rounded-full bg-slate-800 overflow-hidden w-7 h-7 border border-slate-700 shrink-0 mt-0.5">
+                  <div className="avatar rounded-full bg-base-300 overflow-hidden w-7 h-7 border border-base-300 shrink-0 mt-0.5">
                     <img
                       src={
                         comment.user?.profilePicture ||
@@ -142,12 +142,12 @@ const CommentSection = ({ post, authUser }) => {
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <Link
                         to={`/profile/${comment.user?.username}`}
-                        className="text-white text-xs font-semibold hover:text-[#0a66c2] hover:underline"
+                        className="text-base-content text-xs font-semibold hover:text-[#0a66c2] hover:underline"
                       >
                         {comment.user?.name}
                       </Link>
-                      <span className="text-[10px] text-slate-500">•</span>
-                      <span className="text-[10px] text-slate-500">
+                      <span className="text-[10px] text-base-content/40">•</span>
+                      <span className="text-[10px] text-base-content/40">
                         {formatCommentDate(comment.createdAt)}
                       </span>
                     </div>
@@ -155,13 +155,13 @@ const CommentSection = ({ post, authUser }) => {
                     {(isCommentAuthor || isPostAuthor) && (
                       <button
                         onClick={() => removeComment(comment._id)}
-                        className="text-slate-500 hover:text-red-400 p-1 rounded transition-colors"
+                        className="text-base-content/50 hover:text-red-400 p-1 rounded transition-colors"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     )}
                   </div>
-                  <p className="text-slate-300 text-xs leading-relaxed whitespace-pre-wrap break-all">
+                  <p className="text-base-content/80 text-xs leading-relaxed whitespace-pre-wrap break-all">
                     {comment.content}
                   </p>
                 </div>

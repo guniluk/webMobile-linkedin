@@ -65,7 +65,7 @@ export const createWelcomeEmailTemplate = (name, profileUrl) => {
           <tr>
             <td style="border-top: 1px solid #e2e8f0; padding: 24px 30px; text-align: center; color: #8e8e93; font-size: 12px; line-height: 1.5; font-family: sans-serif;">
               <p style="margin: 0 0 8px 0;">This is an automated message sent to ${name}. Please do not reply directly to this email.</p>
-              <p style="margin: 0;">&copy; 2026 UnLinked Corporation, 1600 Amphitheatre Parkway, Mountain View, CA 94043, USA</p>
+              <p style="margin: 0;">&copy; 2026 UnLinkedIn Corporation</p>
             </td>
           </tr>
 
@@ -113,11 +113,11 @@ export const connectionAcceptedEmailTemplate = (
           <tr>
             <td style="padding: 40px 30px;">
               <!-- 받는 사람 이름 출력 -->
-              <h2 style="font-size: 20px; font-weight: 700; color: #1d1d1f; margin-top: 0; margin-bottom: 16px; font-family: sans-serif;">Hi ${senderName},</h2>
+              <h2 style="font-size: 20px; font-weight: 700; color: #1d1d1f; margin-top: 0; margin-bottom: 16px; font-family: sans-serif;">Hi ${recipientName},</h2>
               
               <!-- 수락 메시지 -->
               <p style="font-size: 16px; line-height: 1.6; color: #43434f; margin-top: 0; margin-bottom: 25px; font-family: sans-serif;">
-                Great news! <strong style="color: #1d1d1f;">${recipientName}</strong> has accepted your connection request on UnLinked.
+                Great news! <strong style="color: #1d1d1f;">${senderName}</strong> has accepted your connection request on UnLinked.
               </p>
 
               <!-- 추가 안내 정보 -->
@@ -130,7 +130,7 @@ export const connectionAcceptedEmailTemplate = (
               <!-- View Profile 파란색 버튼 -->
               <div style="text-align: center; margin-bottom: 20px;">
                 <a href="${profileUrl}" style="background-color: #0A66C2; color: #ffffff !important; text-decoration: none; padding: 14px 32px; font-size: 16px; font-weight: bold; border-radius: 28px; display: inline-block; box-shadow: 0 4px 10px rgba(10, 102, 194, 0.25); font-family: sans-serif;">
-                  View ${recipientName}'s Profile
+                  View ${senderName}'s Profile
                 </a>
               </div>
             </td>
@@ -140,7 +140,7 @@ export const connectionAcceptedEmailTemplate = (
           <tr>
             <td style="border-top: 1px solid #e2e8f0; padding: 24px 30px; text-align: center; color: #8e8e93; font-size: 12px; line-height: 1.5; font-family: sans-serif;">
               <p style="margin: 0 0 8px 0;">This is an automated notification. You are receiving this because you enabled connection notifications.</p>
-              <p style="margin: 0;">&copy; 2026 UnLinked Corporation, 1600 Amphitheatre Parkway, Mountain View, CA 94043, USA</p>
+              <p style="margin: 0;">&copy; 2026 UnLinkedIn Corporation</p>
             </td>
           </tr>
 
@@ -223,7 +223,7 @@ export const newCommentEmailTemplate = (
           <tr>
             <td style="border-top: 1px solid #e2e8f0; padding: 24px 30px; text-align: center; color: #8e8e93; font-size: 12px; line-height: 1.5; font-family: sans-serif;">
               <p style="margin: 0 0 8px 0;">This is an automated notification. You are receiving this because you enabled comment notifications.</p>
-              <p style="margin: 0;">&copy; 2026 UnLinked Corporation, 1600 Amphitheatre Parkway, Mountain View, CA 94043, USA</p>
+              <p style="margin: 0;">&copy; 2026 UnLinkedIn Corporation</p>
             </td>
           </tr>
 

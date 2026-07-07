@@ -78,13 +78,39 @@ const PostCard = ({ post, authUser }) => {
     }
   };
 
+  const handleShareEmail = () => {
+    const authorName = post.author?.name || "LinkedIn 회원";
+    const authorUsername = post.author?.username || "";
+    const postContent = post.content || "";
+    const postImage = post.image || "";
+    
+    const subject = encodeURIComponent(`[LinkedIn] ${authorName}님의 게시글 공유`);
+    const profileUrl = authorUsername 
+      ? `${window.location.origin}/profile/${authorUsername}` 
+      : window.location.origin;
+
+    let emailBody = `LinkedIn에서 공유된 게시글을 확인해보세요.\n\n` +
+      `작성자: ${authorName} (@${authorUsername})\n` +
+      `내용:\n${postContent}\n\n`;
+
+    if (postImage) {
+      emailBody += `첨부 이미지 보기: ${postImage}\n\n`;
+    }
+
+    emailBody += `작성자 프로필 보기: ${profileUrl}\n`;
+
+    const body = encodeURIComponent(emailBody);
+
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+  };
+
   return (
-    <div className="bg-[#111827] border border-slate-800 rounded-xl p-4 shadow-xl mb-4 transition-all duration-300 hover:shadow-2xl hover:border-slate-700/60">
+    <div className="bg-base-100 border border-base-300 rounded-xl p-4 shadow-xl mb-4 transition-all duration-300 hover:shadow-2xl hover:border-base-300/80">
       {/* Post Header */}
       <div className="flex justify-between items-start mb-3">
         <div className="flex gap-3">
           <Link to={`/profile/${post.author?.username}`}>
-            <div className="avatar rounded-full bg-slate-800 overflow-hidden w-11 h-11 border border-slate-700">
+            <div className="avatar rounded-full bg-base-300 overflow-hidden w-11 h-11 border border-base-300">
               <img
                 src={
                   post.author?.profilePicture ||
@@ -99,17 +125,17 @@ const PostCard = ({ post, authUser }) => {
           <div className="flex flex-col min-w-0">
             <Link
               to={`/profile/${post.author?.username}`}
-              className="text-white text-sm font-semibold hover:text-[#0a66c2] hover:underline truncate"
+              className="text-base-content text-sm font-semibold hover:text-[#0a66c2] hover:underline truncate"
             >
               {post.author?.name}
             </Link>
-            <p className="text-slate-400 text-xs truncate max-w-50 md:max-w-100">
+            <p className="text-base-content/60 text-xs truncate max-w-50 md:max-w-100">
               {post.author?.headline || "LinkedIn 회원"}
             </p>
-            <div className="flex items-center gap-1 mt-0.5 text-[10px] text-slate-500 font-medium">
+            <div className="flex items-center gap-1 mt-0.5 text-[10px] text-base-content/40 font-medium">
               <span>{formatPostDate(post.createdAt)}</span>
               <span>•</span>
-              <Globe className="w-3 h-3 text-slate-500" />
+              <Globe className="w-3 h-3 text-base-content/40" />
             </div>
           </div>
         </div>
@@ -118,10 +144,10 @@ const PostCard = ({ post, authUser }) => {
           <button
             onClick={handleDelete}
             disabled={isDeleting}
-            className="text-slate-500 hover:text-red-400 p-1.5 rounded-lg hover:bg-slate-800 transition-all duration-200"
+            className="text-base-content/50 hover:text-red-400 p-1.5 rounded-lg hover:bg-base-200 transition-all duration-200"
           >
             {isDeleting ? (
-              <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
+              <Loader2 className="w-4 h-4 animate-spin text-base-content/40" />
             ) : (
               <Trash2 className="w-4 h-4" />
             )}
@@ -130,13 +156,13 @@ const PostCard = ({ post, authUser }) => {
       </div>
 
       {/* Post Content */}
-      <p className="text-slate-200 text-sm whitespace-pre-wrap leading-relaxed break-words mb-3">
+      <p className="text-base-content/90 text-sm whitespace-pre-wrap leading-relaxed break-words mb-3">
         {post.content}
       </p>
 
       {/* Post Image */}
       {post.image && (
-        <div className="rounded-lg overflow-hidden border border-slate-800 max-h-112.5 mb-3">
+        <div className="rounded-lg overflow-hidden border border-base-300 max-h-112.5 mb-3">
           <img
             src={post.image}
             alt="Post Attachment"
@@ -146,7 +172,7 @@ const PostCard = ({ post, authUser }) => {
       )}
 
       {/* Post Stats */}
-      <div className="flex justify-between items-center text-xs text-slate-400 pb-2.5 border-b border-slate-800">
+      <div className="flex justify-between items-center text-xs text-base-content/60 pb-2.5 border-b border-base-300">
         <div className="flex items-center gap-1">
           <div className="flex items-center justify-center bg-[#0a66c2]/80 p-1 rounded-full w-4 h-4">
             <ThumbsUp className="w-2.5 h-2.5 text-white fill-current" />
@@ -162,11 +188,11 @@ const PostCard = ({ post, authUser }) => {
       </div>
 
       {/* Post Actions */}
-      <div className="flex justify-around items-center pt-2 text-xs font-semibold text-slate-400">
+      <div className="flex justify-around items-center pt-2 text-xs font-semibold text-base-content/60">
         <button
           onClick={() => toggleLike()}
           disabled={isLiking}
-          className={`flex items-center gap-2 py-2 px-3 rounded-lg hover:bg-slate-800 transition-colors duration-200 ${
+          className={`flex items-center gap-2 py-2 px-3 rounded-lg hover:bg-base-200 transition-colors duration-200 ${
             isLiked ? "text-[#0a66c2]" : ""
           }`}
         >
@@ -176,7 +202,7 @@ const PostCard = ({ post, authUser }) => {
 
         <button
           onClick={() => setShowComments(!showComments)}
-          className={`flex items-center gap-2 py-2 px-3 rounded-lg hover:bg-slate-800 transition-colors duration-200 ${
+          className={`flex items-center gap-2 py-2 px-3 rounded-lg hover:bg-base-200 transition-colors duration-200 ${
             showComments ? "text-[#0a66c2]" : ""
           }`}
         >
@@ -184,7 +210,10 @@ const PostCard = ({ post, authUser }) => {
           <span>댓글</span>
         </button>
 
-        <button className="flex items-center gap-2 py-2 px-3 rounded-lg hover:bg-slate-800 transition-colors duration-200">
+        <button 
+          onClick={handleShareEmail}
+          className="flex items-center gap-2 py-2 px-3 rounded-lg hover:bg-base-200 transition-colors duration-200"
+        >
           <Share2 className="w-4 h-4" />
           <span>공유</span>
         </button>
