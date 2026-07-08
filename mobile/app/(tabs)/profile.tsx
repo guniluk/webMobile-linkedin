@@ -13,6 +13,8 @@ export default function MyProfile() {
   const queryClient = useQueryClient();
   const clearAuth = useAuthStore((state) => state.clearAuth);
   const authUser = useAuthStore((state) => state.user);
+  const setAuth = useAuthStore((state) => state.setAuth);
+  const token = useAuthStore((state) => state.token);
 
   // Modal states
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
@@ -65,6 +67,7 @@ export default function MyProfile() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["userProfile", authUser?.username] });
       queryClient.setQueryData(["authUser"], data);
+      setAuth(token, data);
       setIsInfoModalOpen(false);
       setIsAboutModalOpen(false);
       setIsExpModalOpen(false);
@@ -215,7 +218,8 @@ export default function MyProfile() {
           {/* Avatar */}
           <TouchableOpacity
             onPress={() => handleImagePick("profilePicture")}
-            className="relative -mt-14 mb-3 inline-block w-28 h-28 rounded-full border-4 border-[#242526] bg-[#18191a] overflow-hidden"
+            className="relative -mt-14 mb-3 w-28 h-28 border-4 border-[#242526] bg-[#18191a]"
+            style={{ borderRadius: 56, overflow: "hidden" }}
           >
             <Avatar user={profile} size={104} />
             <View className="absolute bottom-1 right-1 bg-[#0a66c2] p-1.5 rounded-full border border-white">

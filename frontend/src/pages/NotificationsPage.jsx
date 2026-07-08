@@ -1,6 +1,5 @@
-import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Bell,
   ThumbsUp,
@@ -9,13 +8,12 @@ import {
   Trash2,
   Eye,
   Loader2,
-  X,
 } from 'lucide-react';
-import PostCard from '../components/PostCard';
+import Sidebar from '../components/Sidebar';
 
 const NotificationsPage = () => {
   const queryClient = useQueryClient();
-  const [selectedPostId, setSelectedPostId] = useState(null);
+  const navigate = useNavigate();
 
   // Fetch Current User
   const { data: authUser } = useQuery({
@@ -66,26 +64,13 @@ const NotificationsPage = () => {
     },
   });
 
-  // Fetch Related Post details when selected
-  const { data: activePost, isLoading: isActivePostLoading } = useQuery({
-    queryKey: ['activePost', selectedPostId],
-    queryFn: async () => {
-      if (!selectedPostId) return null;
-      const res = await fetch(`/api/v1/post/${selectedPostId}`);
-      if (!res.ok) throw new Error('포스트 상세 조회 실패');
-      return res.json();
-    },
-    enabled: !!selectedPostId,
-  });
-
   const handleNotificationClick = (notification) => {
     if (!notification.read) {
       markAsRead(notification._id);
     }
     if (notification.relatedPost) {
-      setSelectedPostId(
-        notification.relatedPost._id || notification.relatedPost,
-      );
+      const postId = notification.relatedPost._id || notification.relatedPost;
+      navigate(`/post/${postId}`);
     }
   };
 
@@ -148,7 +133,14 @@ const NotificationsPage = () => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto bg-base-100 border border-base-300 rounded-xl shadow-xl overflow-hidden transition-colors duration-200">
+    <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 max-w-7xl mx-auto transition-colors duration-200">
+      {/* Left Column: Sidebar (Desktop only) */}
+      <div className="col-span-1 lg:col-span-1 hidden lg:block">
+        <Sidebar user={authUser} />
+      </div>
+
+      {/* Right Column: Notifications content */}
+      <div className="col-span-1 lg:col-span-3 bg-base-100 border border-base-300 rounded-xl shadow-xl overflow-hidden">
       {/* Header */}
       <div className="flex justify-between items-center p-4 border-b border-base-300">
         <div className="flex items-center gap-2">
@@ -251,40 +243,7 @@ const NotificationsPage = () => {
             </div>
           ))}
         </div>
-      )}
-
-      {/* Post Modal */}
-      {selectedPostId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 animate-fadeIn">
-          <div className="bg-base-100 border border-base-300 rounded-xl max-w-2xl w-full max-h-[85vh] overflow-y-auto relative shadow-2xl transition-colors duration-200">
-            {/* Modal Header */}
-            <div className="flex justify-between items-center p-4 border-b border-base-300 sticky top-0 bg-base-100 z-10">
-              <h3 className="text-base-content font-bold text-sm">관련 게시물</h3>
-              <button
-                onClick={() => setSelectedPostId(null)}
-                className="text-base-content/60 hover:text-base-content p-1.5 rounded-lg hover:bg-base-200 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Modal Content */}
-            <div className="p-4">
-              {isActivePostLoading ? (
-                <div className="flex justify-center py-20">
-                  <Loader2 className="w-8 h-8 animate-spin text-[#0a66c2]" />
-                </div>
-              ) : activePost ? (
-                <PostCard post={activePost} authUser={authUser} />
-              ) : (
-                <p className="text-base-content/40 text-center py-10">
-                  해당 게시물이 삭제되었거나 권한이 없습니다.
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      )}      </div>
     </div>
   );
 };

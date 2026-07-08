@@ -196,7 +196,10 @@ export default function UserProfile() {
         </View>
 
         <View className="px-5 relative">
-          <View className="relative -mt-14 mb-3 inline-block w-28 h-28 rounded-full border-4 border-[#242526] bg-[#18191a] overflow-hidden shadow-md">
+          <View
+            className="relative -mt-14 mb-3 w-28 h-28 border-4 border-[#242526] bg-[#18191a] shadow-md"
+            style={{ borderRadius: 56, overflow: "hidden" }}
+          >
             <Avatar user={profile} size={104} />
           </View>
 

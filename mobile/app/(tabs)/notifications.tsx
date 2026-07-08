@@ -1,29 +1,17 @@
-import { useState, useCallback } from "react";
-import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Modal, Alert, ScrollView, Platform } from "react-native";
+import { useCallback } from "react";
+import { View, Text, FlatList, TouchableOpacity, Alert } from "react-native";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter, useFocusEffect } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { customFetch } from "../../lib/api";
-import PostCard from "../../components/PostCard";
-import { SafeAreaView } from "react-native-safe-area-context";
 import Avatar from "../../components/Avatar";
 import LoadingSpinner from "../../components/LoadingSpinner";
 
 export default function Notifications() {
   const queryClient = useQueryClient();
   const router = useRouter();
-  const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
 
-  // 1. Fetch Current User
-  const { data: authUser } = useQuery({
-    queryKey: ["authUser"],
-    queryFn: async () => {
-      const res = await customFetch("/auth/me");
-      if (res.status === 401) return null;
-      if (!res.ok) throw new Error("Failed to fetch user");
-      return res.json();
-    },
-  });
+
 
   // 2. Fetch Notifications
   const { data: notifications, isLoading, refetch: refetchNotifications, isRefetching } = useQuery({
@@ -70,25 +58,13 @@ export default function Notifications() {
     onError: (err: any) => Alert.alert("오류", err.message),
   });
 
-  // 5. Fetch Active Post for Modal
-  const { data: activePost, isLoading: isActivePostLoading } = useQuery({
-    queryKey: ["activePost", selectedPostId],
-    queryFn: async () => {
-      if (!selectedPostId) return null;
-      const res = await customFetch(`/post/${selectedPostId}`);
-      if (!res.ok) throw new Error("포스트 상세 조회 실패");
-      return res.json();
-    },
-    enabled: !!selectedPostId,
-  });
-
   const handleNotificationClick = (notification: any) => {
     if (!notification.read) {
       markAsRead(notification._id);
     }
     if (notification.relatedPost) {
       const postId = notification.relatedPost._id || notification.relatedPost;
-      setSelectedPostId(postId);
+      router.push(`/post/${postId}`);
     }
   };
 
@@ -115,7 +91,7 @@ export default function Notifications() {
       default:
         return (
           <View className="bg-[#3a3b3c] p-2 rounded-full">
-            <Ionicons name="bell" size={18} color="#a0a0a0" />
+            <Ionicons name="notifications-outline" size={18} color="#a0a0a0" />
           </View>
         );
     }
@@ -172,7 +148,7 @@ export default function Notifications() {
                 {getNotificationIcon(item.type)}
                 <TouchableOpacity
                   onPress={() => router.push(`/profile/${item.relatedUser?.username}`)}
-                  className="mx-3"
+                  className="ml-3 mr-8"
                 >
                   <Avatar user={item.relatedUser} size={40} />
                 </TouchableOpacity>
@@ -200,38 +176,6 @@ export default function Notifications() {
           )}
         />
       )}
-
-      {/* Related Post Modal */}
-      <Modal visible={!!selectedPostId} animationType="slide" transparent={false}>
-        <SafeAreaView className="flex-1 bg-[#1c1d1f]" edges={["bottom"]}>
-          {/* Status Bar Spacer */}
-          <View style={{ height: Platform.OS === "ios" ? 52 : 32, backgroundColor: "#1c1d1f" }} />
-
-          {/* Modal Header */}
-          <View className="flex-row justify-between items-center px-5 py-4 border-b border-[#2d2e30] bg-[#1c1d1f]">
-            <TouchableOpacity onPress={() => setSelectedPostId(null)} className="py-1 px-2">
-              <Text className="text-gray-400 text-base font-medium">닫기</Text>
-            </TouchableOpacity>
-            <Text className="text-white font-bold text-lg">관련 게시물</Text>
-            <View className="w-10" />
-          </View>
-
-          {/* Modal Content - Scrollable for long posts & comments */}
-          <ScrollView className="flex-1 p-4" showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-            {isActivePostLoading ? (
-              <View className="flex-1 justify-center items-center py-20">
-                <ActivityIndicator size="large" color="#0a66c2" />
-              </View>
-            ) : activePost ? (
-              <PostCard post={activePost} authUser={authUser} />
-            ) : (
-              <Text className="text-gray-400 text-center mt-10">
-                게시물이 삭제되었거나 권한이 없습니다.
-              </Text>
-            )}
-          </ScrollView>
-        </SafeAreaView>
-      </Modal>
     </View>
   );
 }

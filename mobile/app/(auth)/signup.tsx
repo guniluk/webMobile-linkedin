@@ -19,7 +19,7 @@ export default function Signup() {
   const queryClient = useQueryClient();
 
   const { mutate: signupMutate, isPending } = useMutation({
-    mutationFn: async (userData) => {
+    mutationFn: async (userData: any) => {
       const res = await customFetch("/auth/signup", {
         method: "POST",
         body: JSON.stringify(userData),

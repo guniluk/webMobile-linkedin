@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { View, Text, TouchableOpacity, ActivityIndicator, Alert, Share } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ActivityIndicator,
+  Alert,
+  Share,
+} from "react-native";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { Image } from "expo-image";
@@ -64,8 +71,14 @@ export default function PostCard({ post, authUser }: PostCardProps) {
       }
       return res.json();
     },
-    onSuccess: () => {
+    onSuccess: (updatedPost: any) => {
+      queryClient.setQueryData<any[]>(["posts"], (oldPosts) => {
+        if (!oldPosts) return [];
+        return oldPosts.map((p) => (p._id === updatedPost._id ? updatedPost : p));
+      });
+      queryClient.setQueryData(["post", post._id], updatedPost);
       queryClient.invalidateQueries({ queryKey: ["posts"] });
+      queryClient.invalidateQueries({ queryKey: ["post", post._id] });
     },
     onError: (err: any) => {
       Alert.alert("오류", err.message || "오류가 발생했습니다.");
@@ -92,13 +105,17 @@ export default function PostCard({ post, authUser }: PostCardProps) {
   return (
     <View className="bg-[#242526] border border-[#3a3b3c] rounded-2xl p-4 mb-4 shadow-sm">
       {/* Post Header */}
-      <View className="flex-row justify-between items-start mb-3">
+      <View className="flex-row justify-between items-start mb-5">
         <View className="flex-row items-center flex-1 min-w-0">
-          <TouchableOpacity onPress={() => router.push(`/profile/${post.author?.username}`)}>
-            <Avatar user={post.author} size={44} className="mr-3" />
+          <TouchableOpacity
+            onPress={() => router.push(`/profile/${post.author?.username}`)}
+          >
+            <Avatar user={post.author} size={44} className="mr-8" />
           </TouchableOpacity>
-          <View className="flex-1 min-w-0">
-            <TouchableOpacity onPress={() => router.push(`/profile/${post.author?.username}`)}>
+          <View className="flex-1 min-w-0 ml-4">
+            <TouchableOpacity
+              onPress={() => router.push(`/profile/${post.author?.username}`)}
+            >
               <Text className="text-white text-sm font-semibold hover:text-[#0a66c2] truncate">
                 {post.author?.name}
               </Text>
@@ -107,16 +124,24 @@ export default function PostCard({ post, authUser }: PostCardProps) {
               {post.author?.headline || "LinkedIn 회원"}
             </Text>
             <View className="flex-row items-center mt-1">
-              <Text className="text-gray-500 text-[10px] font-medium mr-1.5">
-                {formatPostDate(post.createdAt)}
-              </Text>
+              <TouchableOpacity
+                onPress={() => router.push(`/post/${post._id}`)}
+              >
+                <Text className="text-gray-500 text-[10px] font-medium mr-1.5">
+                  {formatPostDate(post.createdAt)}
+                </Text>
+              </TouchableOpacity>
               <Ionicons name="globe-outline" size={10} color="#808080" />
             </View>
           </View>
         </View>
 
         {isAuthor && (
-          <TouchableOpacity onPress={handleDelete} disabled={isDeleting} className="p-1">
+          <TouchableOpacity
+            onPress={handleDelete}
+            disabled={isDeleting}
+            className="p-1"
+          >
             {isDeleting ? (
               <ActivityIndicator size="small" color="#808080" />
             ) : (
@@ -148,10 +173,14 @@ export default function PostCard({ post, authUser }: PostCardProps) {
           <View className="bg-[#0a66c2] p-1 rounded-full w-4.5 h-4.5 justify-center items-center mr-1">
             <Ionicons name="thumbs-up" size={10} color="white" />
           </View>
-          <Text className="text-gray-400 text-xs">{post.likes?.length || 0}</Text>
+          <Text className="text-gray-400 text-xs">
+            {post.likes?.length || 0}
+          </Text>
         </View>
         <TouchableOpacity onPress={() => setShowComments(!showComments)}>
-          <Text className="text-gray-400 text-xs">댓글 {post.comments?.length || 0}개</Text>
+          <Text className="text-gray-400 text-xs">
+            댓글 {post.comments?.length || 0}개
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -167,7 +196,9 @@ export default function PostCard({ post, authUser }: PostCardProps) {
             size={18}
             color={isLiked ? "#0a66c2" : "#a0a0a0"}
           />
-          <Text className={`text-xs font-semibold ${isLiked ? "text-[#0a66c2]" : "text-gray-400"}`}>
+          <Text
+            className={`text-xs font-semibold ${isLiked ? "text-[#0a66c2]" : "text-gray-400"}`}
+          >
             좋아요
           </Text>
         </TouchableOpacity>
@@ -181,7 +212,9 @@ export default function PostCard({ post, authUser }: PostCardProps) {
             size={18}
             color={showComments ? "#0a66c2" : "#a0a0a0"}
           />
-          <Text className={`text-xs font-semibold ${showComments ? "text-[#0a66c2]" : "text-gray-400"}`}>
+          <Text
+            className={`text-xs font-semibold ${showComments ? "text-[#0a66c2]" : "text-gray-400"}`}
+          >
             댓글
           </Text>
         </TouchableOpacity>

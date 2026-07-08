@@ -36,9 +36,15 @@ const CommentSection = ({ post, authUser }) => {
       }
       return res.json();
     },
-    onSuccess: () => {
+    onSuccess: (updatedPost) => {
       setCommentText("");
+      queryClient.setQueryData(["posts"], (oldPosts) => {
+        if (!oldPosts) return [];
+        return oldPosts.map((p) => (p._id === updatedPost._id ? updatedPost : p));
+      });
+      queryClient.setQueryData(["post", post._id], updatedPost);
       queryClient.invalidateQueries(["posts"]);
+      queryClient.invalidateQueries(["post", post._id]);
     },
     onError: (err) => {
       alert(err.message || "에러가 발생했습니다.");
@@ -56,8 +62,14 @@ const CommentSection = ({ post, authUser }) => {
       }
       return res.json();
     },
-    onSuccess: () => {
+    onSuccess: (updatedPost) => {
+      queryClient.setQueryData(["posts"], (oldPosts) => {
+        if (!oldPosts) return [];
+        return oldPosts.map((p) => (p._id === updatedPost._id ? updatedPost : p));
+      });
+      queryClient.setQueryData(["post", post._id], updatedPost);
       queryClient.invalidateQueries(["posts"]);
+      queryClient.invalidateQueries(["post", post._id]);
     },
     onError: (err) => {
       alert(err.message || "에러가 발생했습니다.");

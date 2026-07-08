@@ -47,29 +47,46 @@ export default function RootLayout() {
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false, headerBackTitle: "Back" }} />
         <Stack.Screen
-        name="profile/[username]"
-        options={{
-          headerShown: true,
-          title: "프로필",
-          headerTransparent: true,
-          headerBackTitle: "Back",
-          headerBackTitleVisible: true,
-          headerStyle: {
-            backgroundColor: "transparent",
-            elevation: 0,
-            shadowOpacity: 0,
-            borderBottomWidth: 0,
-          },
-          headerTitleStyle: {
-            color: "white",
-            fontWeight: "bold",
-          },
-          headerTintColor: "white",
-          contentStyle: {
-            backgroundColor: "#18191a",
-          },
-        }}
-      />
+          name="profile/[username]"
+          options={{
+            headerShown: true,
+            title: "프로필",
+            headerTransparent: true,
+            headerShadowVisible: false,
+            headerBackTitle: "Back",
+            headerStyle: {
+              backgroundColor: "transparent",
+            },
+            headerTitleStyle: {
+              color: "white",
+              fontWeight: "bold",
+            },
+            headerTintColor: "white",
+            contentStyle: {
+              backgroundColor: "#18191a",
+            },
+          }}
+        />
+        <Stack.Screen
+          name="post/[id]"
+          options={{
+            headerShown: true,
+            title: "게시물 상세",
+            headerShadowVisible: false,
+            headerBackTitle: "Back",
+            headerStyle: {
+              backgroundColor: "#18191a",
+            },
+            headerTitleStyle: {
+              color: "white",
+              fontWeight: "bold",
+            },
+            headerTintColor: "#0a66c2",
+            contentStyle: {
+              backgroundColor: "#18191a",
+            },
+          }}
+        />
       </Stack>
 
       {!hasHydrated && (

@@ -101,7 +101,7 @@ export default function PostCreationModal({ visible, onClose, user }: PostCreati
           <ScrollView className="flex-1 px-5 pt-5" keyboardShouldPersistTaps="handled">
             {/* User Info & Visibility Badge */}
             <View className="flex-row items-center mb-6">
-              <Avatar user={user} size={48} className="mr-3.5 border border-gray-600" />
+              <Avatar user={user} size={48} className="mr-8 border border-gray-600" />
               <View>
                 <Text className="text-white font-extrabold text-base">{user?.name}</Text>
                 {/* Visibility Badge */}

@@ -64,8 +64,14 @@ const PostCard = ({ post, authUser }) => {
       }
       return res.json();
     },
-    onSuccess: () => {
+    onSuccess: (updatedPost) => {
+      queryClient.setQueryData(["posts"], (oldPosts) => {
+        if (!oldPosts) return [];
+        return oldPosts.map((p) => (p._id === updatedPost._id ? updatedPost : p));
+      });
+      queryClient.setQueryData(["post", post._id], updatedPost);
       queryClient.invalidateQueries(["posts"]);
+      queryClient.invalidateQueries(["post", post._id]);
     },
     onError: (err) => {
       alert(err.message || "오류가 발생했습니다.");
@@ -83,13 +89,16 @@ const PostCard = ({ post, authUser }) => {
     const authorUsername = post.author?.username || "";
     const postContent = post.content || "";
     const postImage = post.image || "";
-    
-    const subject = encodeURIComponent(`[LinkedIn] ${authorName}님의 게시글 공유`);
-    const profileUrl = authorUsername 
-      ? `${window.location.origin}/profile/${authorUsername}` 
+
+    const subject = encodeURIComponent(
+      `[LinkedIn] ${authorName}님의 게시글 공유`,
+    );
+    const profileUrl = authorUsername
+      ? `${window.location.origin}/profile/${authorUsername}`
       : window.location.origin;
 
-    let emailBody = `LinkedIn에서 공유된 게시글을 확인해보세요.\n\n` +
+    let emailBody =
+      `LinkedIn에서 공유된 게시글을 확인해보세요.\n\n` +
       `작성자: ${authorName} (@${authorUsername})\n` +
       `내용:\n${postContent}\n\n`;
 
@@ -108,14 +117,14 @@ const PostCard = ({ post, authUser }) => {
     <div className="bg-base-100 border border-base-300 rounded-xl p-4 shadow-xl mb-4 transition-all duration-300 hover:shadow-2xl hover:border-base-300/80">
       {/* Post Header */}
       <div className="flex justify-between items-start mb-3">
-        <div className="flex gap-3">
+        <div className="flex gap-6">
           <Link to={`/profile/${post.author?.username}`}>
             <div className="avatar rounded-full bg-base-300 overflow-hidden w-11 h-11 border border-base-300">
               <img
                 src={
                   post.author?.profilePicture ||
                   `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                    post.author?.name || "User"
+                    post.author?.name || "User",
                   )}&background=0a66c2&color=fff`
                 }
                 alt={post.author?.name}
@@ -133,7 +142,9 @@ const PostCard = ({ post, authUser }) => {
               {post.author?.headline || "LinkedIn 회원"}
             </p>
             <div className="flex items-center gap-1 mt-0.5 text-[10px] text-base-content/40 font-medium">
-              <span>{formatPostDate(post.createdAt)}</span>
+              <Link to={`/post/${post._id}`} className="hover:underline hover:text-[#0a66c2]">
+                {formatPostDate(post.createdAt)}
+              </Link>
               <span>•</span>
               <Globe className="w-3 h-3 text-base-content/40" />
             </div>
@@ -156,7 +167,7 @@ const PostCard = ({ post, authUser }) => {
       </div>
 
       {/* Post Content */}
-      <p className="text-base-content/90 text-sm whitespace-pre-wrap leading-relaxed break-words mb-3">
+      <p className="text-base-content/90 text-sm whitespace-pre-wrap leading-relaxed wrap-break-word mb-3">
         {post.content}
       </p>
 
@@ -210,7 +221,7 @@ const PostCard = ({ post, authUser }) => {
           <span>댓글</span>
         </button>
 
-        <button 
+        <button
           onClick={handleShareEmail}
           className="flex items-center gap-2 py-2 px-3 rounded-lg hover:bg-base-200 transition-colors duration-200"
         >

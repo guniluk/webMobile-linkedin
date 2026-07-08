@@ -1,21 +1,21 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Link } from 'react-router-dom';
-import Sidebar from '../components/Sidebar';
-import PostCreation from '../components/PostCreation';
-import PostCard from '../components/PostCard';
-import SuggestedUserCard from '../components/SuggestedUserCard';
-import { Users, AlertCircle, Loader2, UserCheck } from 'lucide-react';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
+import Sidebar from "../components/Sidebar";
+import PostCreation from "../components/PostCreation";
+import PostCard from "../components/PostCard";
+import SuggestedUserCard from "../components/SuggestedUserCard";
+import { Users, AlertCircle, Loader2, UserCheck } from "lucide-react";
 
 const HomePage = () => {
   const queryClient = useQueryClient();
 
   // 1. Fetch Current User
   const { data: authUser } = useQuery({
-    queryKey: ['authUser'],
+    queryKey: ["authUser"],
     queryFn: async () => {
-      const res = await fetch('/api/v1/auth/me');
+      const res = await fetch("/api/v1/auth/me");
       if (res.status === 401) return null;
-      if (!res.ok) throw new Error('Failed to fetch user');
+      if (!res.ok) throw new Error("Failed to fetch user");
       return res.json();
     },
   });
@@ -26,30 +26,30 @@ const HomePage = () => {
     isLoading: isPostsLoading,
     isError: isPostsError,
   } = useQuery({
-    queryKey: ['posts'],
+    queryKey: ["posts"],
     queryFn: async () => {
-      const res = await fetch('/api/v1/post');
-      if (!res.ok) throw new Error('피드 데이터를 가져오는데 실패했습니다.');
+      const res = await fetch("/api/v1/post");
+      if (!res.ok) throw new Error("피드 데이터를 가져오는데 실패했습니다.");
       return res.json();
     },
   });
 
   // 3. Fetch Suggested Connections
   const { data: suggestedUsers, isLoading: isSuggestionsLoading } = useQuery({
-    queryKey: ['suggestedConnections'],
+    queryKey: ["suggestedConnections"],
     queryFn: async () => {
-      const res = await fetch('/api/v1/user/suggestions');
-      if (!res.ok) throw new Error('추천 친구를 가져오는데 실패했습니다.');
+      const res = await fetch("/api/v1/user/suggestions");
+      if (!res.ok) throw new Error("추천 친구를 가져오는데 실패했습니다.");
       return res.json();
     },
   });
 
   // 4. Fetch Connection Requests (Incoming)
   const { data: connectionRequests } = useQuery({
-    queryKey: ['connectionRequests'],
+    queryKey: ["connectionRequests"],
     queryFn: async () => {
-      const res = await fetch('/api/v1/connection/requests');
-      if (!res.ok) throw new Error('1촌 요청을 가져오는데 실패했습니다.');
+      const res = await fetch("/api/v1/connection/requests");
+      if (!res.ok) throw new Error("1촌 요청을 가져오는데 실패했습니다.");
       return res.json();
     },
   });
@@ -58,19 +58,19 @@ const HomePage = () => {
   const { mutate: acceptRequest } = useMutation({
     mutationFn: async (requestId) => {
       const res = await fetch(`/api/v1/connection/accept/${requestId}`, {
-        method: 'PUT',
+        method: "PUT",
       });
       if (!res.ok) {
         const errorData = await res.json();
-        throw new Error(errorData.error || errorData.message || '수락 실패');
+        throw new Error(errorData.error || errorData.message || "수락 실패");
       }
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(['connectionRequests']);
-      queryClient.invalidateQueries(['posts']);
-      queryClient.invalidateQueries(['authUser']);
-      queryClient.invalidateQueries(['suggestedConnections']);
+      queryClient.invalidateQueries(["connectionRequests"]);
+      queryClient.invalidateQueries(["posts"]);
+      queryClient.invalidateQueries(["authUser"]);
+      queryClient.invalidateQueries(["suggestedConnections"]);
     },
     onError: (err) => alert(err.message),
   });
@@ -78,16 +78,16 @@ const HomePage = () => {
   const { mutate: rejectRequest } = useMutation({
     mutationFn: async (requestId) => {
       const res = await fetch(`/api/v1/connection/reject/${requestId}`, {
-        method: 'PUT',
+        method: "PUT",
       });
       if (!res.ok) {
         const errorData = await res.json();
-        throw new Error(errorData.error || errorData.message || '거절 실패');
+        throw new Error(errorData.error || errorData.message || "거절 실패");
       }
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(['connectionRequests']);
+      queryClient.invalidateQueries(["connectionRequests"]);
     },
     onError: (err) => alert(err.message),
   });
@@ -106,7 +106,9 @@ const HomePage = () => {
         {isPostsLoading ? (
           <div className="flex flex-col items-center justify-center py-10 gap-3">
             <Loader2 className="w-8 h-8 animate-spin text-[#0a66c2]" />
-            <p className="text-base-content/60 text-sm">피드를 불러오는 중...</p>
+            <p className="text-base-content/60 text-sm">
+              피드를 불러오는 중...
+            </p>
           </div>
         ) : isPostsError ? (
           <div className="bg-base-100 border border-red-500/20 p-6 rounded-xl flex flex-col items-center text-center gap-2">
@@ -119,7 +121,9 @@ const HomePage = () => {
         ) : posts?.length === 0 ? (
           <div className="bg-base-100 border border-base-300 p-8 rounded-xl flex flex-col items-center text-center gap-3">
             <Users className="w-10 h-10 text-base-content/40" />
-            <h3 className="text-base-content font-semibold">표시할 피드가 없습니다</h3>
+            <h3 className="text-base-content font-semibold">
+              표시할 피드가 없습니다
+            </h3>
             <p className="text-base-content/60 text-xs max-w-70">
               아직 아무도 포스팅하지 않았거나 일촌이 없습니다. 새로운 1촌을 맺어
               소식을 받아보세요!
@@ -158,7 +162,7 @@ const HomePage = () => {
                           src={
                             req.sender?.profilePicture ||
                             `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                              req.sender?.name || 'User',
+                              req.sender?.name || "User",
                             )}&background=0a66c2&color=fff`
                           }
                           alt={req.sender?.name}
@@ -173,7 +177,7 @@ const HomePage = () => {
                         {req.sender?.name}
                       </Link>
                       <p className="text-base-content/60 text-[10px] truncate max-w-32.5">
-                        {req.sender?.headline || 'LinkedIn 회원'}
+                        {req.sender?.headline || "LinkedIn 회원"}
                       </p>
                     </div>
                   </div>

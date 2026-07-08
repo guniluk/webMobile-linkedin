@@ -46,7 +46,7 @@ export default function Network() {
       queryClient.invalidateQueries({ queryKey: ["connections"] });
       queryClient.invalidateQueries({ queryKey: ["connectionRequests"] });
       queryClient.invalidateQueries({ queryKey: ["suggestedConnections"] });
-    }, [queryClient])
+    }, [queryClient]),
   );
 
   // Mutations
@@ -117,14 +117,18 @@ export default function Network() {
     ]);
   };
 
-  const isLoadingAll = isConnLoading && isRequestsLoading && isSuggestionsLoading;
+  const isLoadingAll =
+    isConnLoading && isRequestsLoading && isSuggestionsLoading;
 
   if (isLoadingAll) {
     return <LoadingSpinner />;
   }
 
   return (
-    <ScrollView className="flex-1 bg-[#18191a]" contentContainerStyle={{ paddingBottom: 30 }}>
+    <ScrollView
+      className="flex-1 bg-[#18191a]"
+      contentContainerStyle={{ paddingBottom: 30 }}
+    >
       {/* 1. Connection Requests Section */}
       {connectionRequests && connectionRequests.length > 0 && (
         <View className="bg-[#242526] p-4 border-b border-[#3a3b3c] mb-3">
@@ -138,10 +142,12 @@ export default function Network() {
                 className="bg-[#18191a] border border-[#3a3b3c]/50 p-3 rounded-xl flex-row justify-between items-center mb-2"
               >
                 <TouchableOpacity
-                  onPress={() => router.push(`/profile/${req.sender?.username}`)}
+                  onPress={() =>
+                    router.push(`/profile/${req.sender?.username}`)
+                  }
                   className="flex-row items-center flex-1 min-w-0"
                 >
-                  <Avatar user={req.sender} size={40} className="mr-2.5" />
+                  <Avatar user={req.sender} size={40} className="mr-8" />
                   <View className="flex-1 min-w-0">
                     <Text className="text-white text-xs font-bold truncate">
                       {req.sender?.name}
@@ -157,13 +163,17 @@ export default function Network() {
                     onPress={() => acceptRequest(req._id)}
                     className="bg-emerald-600 px-3 py-1.5 rounded-full"
                   >
-                    <Text className="text-white text-[11px] font-semibold">수락</Text>
+                    <Text className="text-white text-[11px] font-semibold">
+                      수락
+                    </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => rejectRequest(req._id)}
                     className="bg-[#3a3b3c] px-3 py-1.5 rounded-full"
                   >
-                    <Text className="text-gray-300 text-[11px] font-semibold">거절</Text>
+                    <Text className="text-gray-300 text-[11px] font-semibold">
+                      거절
+                    </Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -176,19 +186,31 @@ export default function Network() {
       {suggestedUsers && suggestedUsers.length > 0 && (
         <View className="bg-[#242526] p-4 border-b border-[#3a3b3c] mb-3">
           <Text className="text-white font-bold text-sm mb-3">인맥 추천</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row space-x-3 mb-2">
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            className="flex-row space-x-3 mb-2"
+          >
             {suggestedUsers.map((user: any) => (
               <View
                 key={user._id}
                 className="bg-[#18191a] border border-[#3a3b3c]/50 p-3 rounded-xl items-center w-36 mr-3"
               >
-                <TouchableOpacity onPress={() => router.push(`/profile/${user.username}`)}>
+                <TouchableOpacity
+                  onPress={() => router.push(`/profile/${user.username}`)}
+                >
                   <Avatar user={user} size={56} className="mb-2" />
                 </TouchableOpacity>
-                <Text className="text-white text-xs font-bold truncate w-full text-center" numberOfLines={1}>
+                <Text
+                  className="text-white text-xs font-bold truncate w-full text-center"
+                  numberOfLines={1}
+                >
                   {user.name}
                 </Text>
-                <Text className="text-gray-400 text-[9px] text-center h-7 mt-0.5 truncate w-full" numberOfLines={2}>
+                <Text
+                  className="text-gray-400 text-[9px] text-center h-7 mt-0.5 truncate w-full"
+                  numberOfLines={2}
+                >
                   {user.headline || "LinkedIn 회원"}
                 </Text>
                 <TouchableOpacity
@@ -196,7 +218,9 @@ export default function Network() {
                   disabled={pendingSendId === user._id}
                   className="bg-transparent border border-[#0a66c2] px-3 py-1 mt-2.5 rounded-full w-full items-center"
                 >
-                  <Text className="text-[#0a66c2] text-[10px] font-bold">1촌 맺기</Text>
+                  <Text className="text-[#0a66c2] text-[10px] font-bold">
+                    1촌 맺기
+                  </Text>
                 </TouchableOpacity>
               </View>
             ))}
@@ -212,7 +236,9 @@ export default function Network() {
         {connections?.length === 0 ? (
           <View className="py-8 items-center justify-center">
             <Ionicons name="people-outline" size={40} color="#808080" />
-            <Text className="text-gray-400 text-xs mt-2">아직 1촌이 없습니다.</Text>
+            <Text className="text-gray-400 text-xs mt-2">
+              아직 1촌이 없습니다.
+            </Text>
           </View>
         ) : (
           connections?.map((conn: any) => (
@@ -224,8 +250,8 @@ export default function Network() {
                 onPress={() => router.push(`/profile/${conn.username}`)}
                 className="flex-row items-center flex-1 min-w-0"
               >
-                <Avatar user={conn} size={44} className="mr-3" />
-                <View className="flex-1 min-w-0">
+                <Avatar user={conn} size={44} className="mr-8" />
+                <View className="flex-1 min-w-0 ml-4">
                   <View className="flex-row items-center flex-wrap">
                     <Text className="text-white text-xs font-semibold truncate mr-2">
                       {conn.name}
@@ -249,9 +275,13 @@ export default function Network() {
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => handleDisconnect(conn._id, conn.name)}
-                  className="bg-[#3a3b3c] p-2 rounded-full"
+                  className="bg-[#3a3b3c] p-2 rounded-full ml-2"
                 >
-                  <Ionicons name="person-remove-outline" size={16} color="#f87171" />
+                  <Ionicons
+                    name="person-remove-outline"
+                    size={16}
+                    color="#f87171"
+                  />
                 </TouchableOpacity>
               </View>
             </View>

@@ -11,13 +11,14 @@ export default function Avatar({ user, size = 40, className = "" }: AvatarProps)
     user?.profilePicture ||
     `https://ui-avatars.com/api/?name=${encodeURIComponent(
       user?.name || "User"
-    )}&background=0a66c2&color=fff`;
+    )}&background=0a66c2&color=fff&size=${size * 2}`;
 
   return (
     <Image
       source={avatarUrl}
-      style={{ width: size, height: size }}
-      className={`rounded-full bg-gray-700 ${className}`}
+      style={{ width: size, height: size, borderRadius: size / 2, overflow: "hidden" }}
+      contentFit="contain"
+      className={`bg-gray-700 ${className}`}
     />
   );
 }

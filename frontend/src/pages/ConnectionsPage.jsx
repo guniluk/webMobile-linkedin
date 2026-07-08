@@ -1,9 +1,21 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { Users, UserMinus, ExternalLink, Loader2 } from "lucide-react";
+import Sidebar from "../components/Sidebar";
 
 const ConnectionsPage = () => {
   const queryClient = useQueryClient();
+
+  // Fetch Current User
+  const { data: authUser } = useQuery({
+    queryKey: ["authUser"],
+    queryFn: async () => {
+      const res = await fetch("/api/v1/auth/me");
+      if (res.status === 401) return null;
+      if (!res.ok) throw new Error("Failed to fetch user");
+      return res.json();
+    },
+  });
 
   // 1. Fetch My Connections
   const { data: connections, isLoading, isError } = useQuery({
@@ -93,7 +105,14 @@ const ConnectionsPage = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto transition-colors duration-200">
+    <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 max-w-7xl mx-auto transition-colors duration-200">
+      {/* Left Column: Sidebar (Desktop only) */}
+      <div className="col-span-1 lg:col-span-1 hidden lg:block">
+        <Sidebar user={authUser} />
+      </div>
+
+      {/* Right Column: Connection content */}
+      <div className="col-span-1 lg:col-span-3">
       {/* Page Header */}
       <div className="bg-base-100 border border-base-300 rounded-xl p-6 shadow-xl mb-6">
         <div className="flex items-center gap-3">
@@ -258,6 +277,7 @@ const ConnectionsPage = () => {
           ))}
         </div>
       )}
+      </div>
     </div>
   );
 };

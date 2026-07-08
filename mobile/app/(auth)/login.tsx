@@ -14,7 +14,7 @@ export default function Login() {
   const queryClient = useQueryClient();
 
   const { mutate: loginMutate, isPending } = useMutation({
-    mutationFn: async (credentials) => {
+    mutationFn: async (credentials: any) => {
       const res = await customFetch("/auth/login", {
         method: "POST",
         body: JSON.stringify(credentials),

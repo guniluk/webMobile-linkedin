@@ -42,9 +42,15 @@ export default function CommentSection({ post, authUser }: CommentSectionProps) 
       }
       return res.json();
     },
-    onSuccess: () => {
+    onSuccess: (updatedPost: any) => {
       setCommentText("");
+      queryClient.setQueryData<any[]>(["posts"], (oldPosts) => {
+        if (!oldPosts) return [];
+        return oldPosts.map((p) => (p._id === updatedPost._id ? updatedPost : p));
+      });
+      queryClient.setQueryData(["post", post._id], updatedPost);
       queryClient.invalidateQueries({ queryKey: ["posts"] });
+      queryClient.invalidateQueries({ queryKey: ["post", post._id] });
     },
     onError: (err: any) => {
       Alert.alert("오류", err.message || "에러가 발생했습니다.");
@@ -61,8 +67,14 @@ export default function CommentSection({ post, authUser }: CommentSectionProps) 
       }
       return res.json();
     },
-    onSuccess: () => {
+    onSuccess: (updatedPost: any) => {
+      queryClient.setQueryData<any[]>(["posts"], (oldPosts) => {
+        if (!oldPosts) return [];
+        return oldPosts.map((p) => (p._id === updatedPost._id ? updatedPost : p));
+      });
+      queryClient.setQueryData(["post", post._id], updatedPost);
       queryClient.invalidateQueries({ queryKey: ["posts"] });
+      queryClient.invalidateQueries({ queryKey: ["post", post._id] });
     },
     onError: (err: any) => {
       Alert.alert("오류", err.message || "에러가 발생했습니다.");
@@ -84,7 +96,7 @@ export default function CommentSection({ post, authUser }: CommentSectionProps) 
   return (
     <View className="mt-4 pt-4 border-t border-[#3a3b3c]">
       {/* Comment Form */}
-      <View className="flex-row items-center mb-4 space-x-2">
+      <View className="flex-row items-center mb-4 space-x-4">
         <Avatar user={authUser} size={32} />
         <TextInput
           value={commentText}
@@ -125,7 +137,7 @@ export default function CommentSection({ post, authUser }: CommentSectionProps) 
                 className="flex-row items-start p-3 rounded-lg bg-[#242526] border border-[#3a3b3c]/40 mb-2"
               >
                 <TouchableOpacity onPress={() => router.push(`/profile/${comment.user?.username}`)}>
-                  <Avatar user={comment.user} size={32} className="mr-2.5" />
+                  <Avatar user={comment.user} size={32} className="mr-8" />
                 </TouchableOpacity>
 
                 <View className="flex-1 min-w-0">

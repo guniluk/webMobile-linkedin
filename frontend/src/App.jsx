@@ -8,6 +8,7 @@ import LogoutPage from "./pages/auth/LogoutPage";
 import ProfilePage from "./pages/ProfilePage";
 import NotificationsPage from "./pages/NotificationsPage";
 import ConnectionsPage from "./pages/ConnectionsPage";
+import PostPage from "./pages/PostPage";
 import { useQuery } from "@tanstack/react-query";
 
 const App = () => {
@@ -79,6 +80,10 @@ const App = () => {
         <Route
           path="/network"
           element={authUser ? <ConnectionsPage /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/post/:id"
+          element={authUser ? <PostPage /> : <Navigate to="/login" />}
         />
       </Routes>
     </Layout>

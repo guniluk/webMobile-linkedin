@@ -48,7 +48,7 @@ export default function Home() {
   return (
     <View className="flex-1 bg-[#18191a]">
       {/* Header / Post Creation Starter */}
-      <View className="bg-[#242526] p-4 border-b border-[#3a3b3c] flex-row items-center space-x-3">
+      <View className="bg-[#242526] p-4 border-b border-[#3a3b3c] flex-row items-center space-x-5">
         <Avatar user={authUser} size={36} />
         <TouchableOpacity
           onPress={() => setModalVisible(true)}
