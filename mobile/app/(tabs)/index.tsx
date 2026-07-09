@@ -42,7 +42,7 @@ export default function Home() {
   useFocusEffect(
     useCallback(() => {
       refetchPosts();
-    }, [refetchPosts])
+    }, [refetchPosts]),
   );
 
   return (
@@ -54,7 +54,9 @@ export default function Home() {
           onPress={() => setModalVisible(true)}
           className="flex-1 bg-[#3a3b3c] rounded-full px-4 py-2 justify-center"
         >
-          <Text className="text-gray-400 text-sm">나누고 싶은 생각을 공유하세요...</Text>
+          <Text className="text-sm text-gray-400">
+            나누고 싶은 생각을 공유하세요...
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => setModalVisible(true)} className="p-1">
           <Ionicons name="image-outline" size={24} color="#0a66c2" />
@@ -65,32 +67,37 @@ export default function Home() {
       {isPostsLoading ? (
         <LoadingSpinner />
       ) : isPostsError ? (
-        <View className="flex-1 justify-center items-center p-6 text-center">
+        <View className="items-center justify-center flex-1 p-6 text-center">
           <Ionicons name="alert-circle-outline" size={48} color="#f87171" />
-          <Text className="text-white font-bold text-lg mt-2">오류 발생</Text>
-          <Text className="text-gray-400 text-xs text-center mt-1">
+          <Text className="mt-2 text-lg font-bold text-white">오류 발생</Text>
+          <Text className="mt-1 text-xs text-center text-gray-400">
             피드를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.
           </Text>
           <TouchableOpacity
             onPress={() => refetchPosts()}
             className="mt-4 bg-[#0a66c2] px-4 py-2 rounded-full"
           >
-            <Text className="text-white font-semibold text-sm">다시 시도</Text>
+            <Text className="text-sm font-semibold text-white">다시 시도</Text>
           </TouchableOpacity>
         </View>
       ) : posts?.length === 0 ? (
-        <View className="flex-1 justify-center items-center p-8 text-center">
+        <View className="items-center justify-center flex-1 p-8 text-center">
           <Ionicons name="people-outline" size={64} color="#505050" />
-          <Text className="text-white font-bold text-lg mt-3">표시할 피드가 없습니다</Text>
+          <Text className="mt-3 text-lg font-bold text-white">
+            표시할 피드가 없습니다
+          </Text>
           <Text className="text-gray-400 text-xs text-center mt-1 max-w-[260px]">
-            아직 아무도 포스팅하지 않았거나 1촌이 없습니다. 새로운 1촌을 맺어 소식을 받아보세요!
+            아직 아무도 포스팅하지 않았거나 1촌이 없습니다. 새로운 1촌을 맺어
+            소식을 받아보세요!
           </Text>
         </View>
       ) : (
         <FlatList
           data={posts}
           keyExtractor={(item) => item._id}
-          renderItem={({ item }) => <PostCard post={item} authUser={authUser} />}
+          renderItem={({ item }) => (
+            <PostCard post={item} authUser={authUser} />
+          )}
           contentContainerStyle={{ padding: 12 }}
           onRefresh={refetchPosts}
           refreshing={isRefetching}

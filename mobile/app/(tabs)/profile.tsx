@@ -1,5 +1,13 @@
 import { useState } from "react";
-import { View, Text, ScrollView, TouchableOpacity, Alert, TextInput, Modal } from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  Alert,
+  TextInput,
+  Modal,
+} from "react-native";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
@@ -23,7 +31,11 @@ export default function MyProfile() {
   const [isEduModalOpen, setIsEduModalOpen] = useState(false);
 
   // Form states
-  const [infoForm, setInfoForm] = useState({ name: "", headline: "", location: "" });
+  const [infoForm, setInfoForm] = useState({
+    name: "",
+    headline: "",
+    location: "",
+  });
   const [aboutForm, setAboutForm] = useState("");
   const [newSkill, setNewSkill] = useState("");
   const [expForm, setExpForm] = useState({
@@ -65,7 +77,9 @@ export default function MyProfile() {
       return res.json();
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["userProfile", authUser?.username] });
+      queryClient.invalidateQueries({
+        queryKey: ["userProfile", authUser?.username],
+      });
       queryClient.setQueryData(["authUser"], data);
       setAuth(token, data);
       setIsInfoModalOpen(false);
@@ -120,7 +134,13 @@ export default function MyProfile() {
     }
     const updatedExp = [...(profile?.experience || []), expForm];
     updateProfile({ experience: updatedExp });
-    setExpForm({ title: "", company: "", description: "", startDate: "", endDate: "" });
+    setExpForm({
+      title: "",
+      company: "",
+      description: "",
+      startDate: "",
+      endDate: "",
+    });
   };
 
   const handleRemoveExperience = (expId: string) => {
@@ -130,7 +150,9 @@ export default function MyProfile() {
         text: "삭제",
         style: "destructive",
         onPress: () => {
-          const updatedExp = profile.experience.filter((exp: any) => exp._id !== expId);
+          const updatedExp = profile.experience.filter(
+            (exp: any) => exp._id !== expId,
+          );
           updateProfile({ experience: updatedExp });
         },
       },
@@ -155,7 +177,9 @@ export default function MyProfile() {
         text: "삭제",
         style: "destructive",
         onPress: () => {
-          const updatedEdu = profile.education.filter((edu: any) => edu._id !== eduId);
+          const updatedEdu = profile.education.filter(
+            (edu: any) => edu._id !== eduId,
+          );
           updateProfile({ education: updatedEdu });
         },
       },
@@ -175,7 +199,9 @@ export default function MyProfile() {
   };
 
   const handleRemoveSkill = (skillToRemove: string) => {
-    const updatedSkills = profile.skills.filter((s: string) => s !== skillToRemove);
+    const updatedSkills = profile.skills.filter(
+      (s: string) => s !== skillToRemove,
+    );
     updateProfile({ skills: updatedSkills });
   };
 
@@ -198,23 +224,32 @@ export default function MyProfile() {
   }
 
   return (
-    <ScrollView className="flex-1 bg-[#18191a]" contentContainerStyle={{ paddingBottom: 40 }}>
+    <ScrollView
+      className="flex-1 bg-[#18191a]"
+      contentContainerStyle={{ paddingBottom: 40 }}
+    >
       {/* 1. Header Card (Banner, Avatar, Meta, Logout) */}
       <View className="bg-[#242526] border-b border-[#3a3b3c] pb-5">
         {/* Banner */}
-        <TouchableOpacity onPress={() => handleImagePick("bannerImg")} className="h-40 bg-slate-800 bg-center bg-cover relative">
+        <TouchableOpacity
+          onPress={() => handleImagePick("bannerImg")}
+          className="relative h-40 bg-center bg-cover bg-slate-800"
+        >
           <Image
-            source={profile?.bannerImg || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800"}
+            source={
+              profile?.bannerImg ||
+              "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800"
+            }
             style={{ width: "100%", height: "100%" }}
             contentFit="cover"
           />
-          <View className="absolute top-3 right-3 bg-black/60 p-2 rounded-full border border-gray-600">
+          <View className="absolute p-2 border border-gray-600 rounded-full top-3 right-3 bg-black/60">
             <Ionicons name="camera-outline" size={16} color="white" />
           </View>
         </TouchableOpacity>
 
         {/* Profile Info Area */}
-        <View className="px-5 relative">
+        <View className="relative px-5">
           {/* Avatar */}
           <TouchableOpacity
             onPress={() => handleImagePick("profilePicture")}
@@ -227,29 +262,39 @@ export default function MyProfile() {
             </View>
           </TouchableOpacity>
 
-          <View className="flex-row justify-between items-start flex-wrap">
+          <View className="flex-row flex-wrap items-start justify-between">
             <View className="flex-1 min-w-[200px]">
-              <View className="flex-row items-center flex-wrap">
-                <Text className="text-white font-extrabold text-xl mr-2">{profile?.name}</Text>
-                <Text className="text-gray-400 text-xs">@{profile?.username}</Text>
+              <View className="flex-row flex-wrap items-center">
+                <Text className="mr-2 text-xl font-extrabold text-white">
+                  {profile?.name}
+                </Text>
+                <Text className="text-xs text-gray-400">
+                  @{profile?.username}
+                </Text>
               </View>
-              <Text className="text-gray-200 text-sm mt-1">{profile?.headline || "LinkedIn 회원"}</Text>
+              <Text className="mt-1 text-sm text-gray-200">
+                {profile?.headline || "LinkedIn 회원"}
+              </Text>
               <View className="flex-row items-center mt-2.5 space-x-1">
                 <Ionicons name="location-outline" size={12} color="#a0a0a0" />
-                <Text className="text-gray-400 text-xs">{profile?.location || "위치 비공개"}</Text>
+                <Text className="text-xs text-gray-400">
+                  {profile?.location || "위치 비공개"}
+                </Text>
               </View>
               <Text className="text-[#0a66c2] text-xs font-bold mt-2">
                 1촌 {profile?.connections?.length || 0}명
               </Text>
             </View>
 
-            <View className="flex-row space-x-2 mt-3 w-full justify-end">
+            <View className="flex-row justify-end w-full mt-3 space-x-2">
               <TouchableOpacity
                 onPress={openInfoModal}
                 className="bg-[#0a66c2]/10 border border-[#0a66c2]/30 px-4 py-2 rounded-full flex-row items-center space-x-1.5"
               >
                 <Ionicons name="create-outline" size={14} color="#0a66c2" />
-                <Text className="text-[#0a66c2] font-semibold text-xs">정보 수정</Text>
+                <Text className="text-[#0a66c2] font-semibold text-xs">
+                  정보 수정
+                </Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -257,7 +302,9 @@ export default function MyProfile() {
                 className="bg-red-950/20 border border-red-900/40 px-4 py-2 rounded-full flex-row items-center space-x-1.5"
               >
                 <Ionicons name="log-out-outline" size={14} color="#f87171" />
-                <Text className="text-[#f87171] font-semibold text-xs">로그아웃</Text>
+                <Text className="text-[#f87171] font-semibold text-xs">
+                  로그아웃
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -266,48 +313,71 @@ export default function MyProfile() {
 
       {/* 2. About Section */}
       <View className="bg-[#242526] p-5 border-b border-[#3a3b3c] mt-3">
-        <View className="flex-row justify-between items-center mb-3">
-          <Text className="text-white font-bold text-base">소개</Text>
+        <View className="flex-row items-center justify-between mb-3">
+          <Text className="text-base font-bold text-white">소개</Text>
           <TouchableOpacity onPress={openAboutModal} className="p-1">
             <Ionicons name="create-outline" size={18} color="#0a66c2" />
           </TouchableOpacity>
         </View>
-        <Text className="text-gray-300 text-sm leading-relaxed">
+        <Text className="text-sm leading-relaxed text-gray-300">
           {profile?.about || "소개글이 없습니다. 프로필을 작성해보세요!"}
         </Text>
       </View>
 
       {/* 3. Experience Section */}
       <View className="bg-[#242526] p-5 border-b border-[#3a3b3c] mt-3">
-        <View className="flex-row justify-between items-center mb-3">
-          <Text className="text-white font-bold text-base">경력</Text>
-          <TouchableOpacity onPress={() => setIsExpModalOpen(true)} className="p-1">
+        <View className="flex-row items-center justify-between mb-3">
+          <Text className="text-base font-bold text-white">경력</Text>
+          <TouchableOpacity
+            onPress={() => setIsExpModalOpen(true)}
+            className="p-1"
+          >
             <Ionicons name="add-outline" size={22} color="#0a66c2" />
           </TouchableOpacity>
         </View>
         {profile?.experience?.length === 0 ? (
-          <Text className="text-gray-500 text-xs py-2">등록된 경력이 없습니다.</Text>
+          <Text className="py-2 text-xs text-gray-500">
+            등록된 경력이 없습니다.
+          </Text>
         ) : (
           <View className="space-y-4">
             {profile?.experience.map((exp: any) => (
-              <View key={exp._id} className="flex-row justify-between items-start border-b border-[#3a3b3c]/50 pb-3 mb-3 last:border-b-0 last:pb-0 last:mb-0">
+              <View
+                key={exp._id}
+                className="flex-row justify-between items-start border-b border-[#3a3b3c]/50 pb-3 mb-3 last:border-b-0 last:pb-0 last:mb-0"
+              >
                 <View className="flex-row flex-1 mr-2">
                   <View className="bg-[#3a3b3c] p-2 rounded-lg justify-center items-center h-10 w-10 mr-3">
-                    <Ionicons name="briefcase-outline" size={18} color="#a0a0a0" />
+                    <Ionicons
+                      name="briefcase-outline"
+                      size={18}
+                      color="#a0a0a0"
+                    />
                   </View>
                   <View className="flex-1 min-w-0">
-                    <Text className="text-white text-sm font-semibold truncate">{exp.title}</Text>
-                    <Text className="text-gray-300 text-xs mt-0.5">{exp.company}</Text>
+                    <Text className="text-sm font-semibold text-white truncate">
+                      {exp.title}
+                    </Text>
+                    <Text className="text-gray-300 text-xs mt-0.5">
+                      {exp.company}
+                    </Text>
                     <Text className="text-gray-500 text-[10px] mt-1">
                       {new Date(exp.startDate).toLocaleDateString()} ~{" "}
-                      {exp.endDate ? new Date(exp.endDate).toLocaleDateString() : "재직 중"}
+                      {exp.endDate
+                        ? new Date(exp.endDate).toLocaleDateString()
+                        : "재직 중"}
                     </Text>
                     {exp.description ? (
-                      <Text className="text-gray-400 text-xs mt-1.5 leading-relaxed">{exp.description}</Text>
+                      <Text className="text-gray-400 text-xs mt-1.5 leading-relaxed">
+                        {exp.description}
+                      </Text>
                     ) : null}
                   </View>
                 </View>
-                <TouchableOpacity onPress={() => handleRemoveExperience(exp._id)} className="p-1">
+                <TouchableOpacity
+                  onPress={() => handleRemoveExperience(exp._id)}
+                  className="p-1"
+                >
                   <Ionicons name="trash-outline" size={16} color="#f87171" />
                 </TouchableOpacity>
               </View>
@@ -318,31 +388,46 @@ export default function MyProfile() {
 
       {/* 4. Education Section */}
       <View className="bg-[#242526] p-5 border-b border-[#3a3b3c] mt-3">
-        <View className="flex-row justify-between items-center mb-3">
-          <Text className="text-white font-bold text-base">학력</Text>
-          <TouchableOpacity onPress={() => setIsEduModalOpen(true)} className="p-1">
+        <View className="flex-row items-center justify-between mb-3">
+          <Text className="text-base font-bold text-white">학력</Text>
+          <TouchableOpacity
+            onPress={() => setIsEduModalOpen(true)}
+            className="p-1"
+          >
             <Ionicons name="add-outline" size={22} color="#0a66c2" />
           </TouchableOpacity>
         </View>
         {profile?.education?.length === 0 ? (
-          <Text className="text-gray-500 text-xs py-2">등록된 학력이 없습니다.</Text>
+          <Text className="py-2 text-xs text-gray-500">
+            등록된 학력이 없습니다.
+          </Text>
         ) : (
           <View className="space-y-4">
             {profile?.education.map((edu: any) => (
-              <View key={edu._id} className="flex-row justify-between items-start border-b border-[#3a3b3c]/50 pb-3 mb-3 last:border-b-0 last:pb-0 last:mb-0">
+              <View
+                key={edu._id}
+                className="flex-row justify-between items-start border-b border-[#3a3b3c]/50 pb-3 mb-3 last:border-b-0 last:pb-0 last:mb-0"
+              >
                 <View className="flex-row flex-1 mr-2">
                   <View className="bg-[#3a3b3c] p-2 rounded-lg justify-center items-center h-10 w-10 mr-3">
                     <Ionicons name="school-outline" size={18} color="#a0a0a0" />
                   </View>
                   <View className="flex-1 min-w-0">
-                    <Text className="text-white text-sm font-semibold truncate">{edu.school}</Text>
-                    <Text className="text-gray-300 text-xs mt-0.5">{edu.fieldOfStudy}</Text>
+                    <Text className="text-sm font-semibold text-white truncate">
+                      {edu.school}
+                    </Text>
+                    <Text className="text-gray-300 text-xs mt-0.5">
+                      {edu.fieldOfStudy}
+                    </Text>
                     <Text className="text-gray-500 text-[10px] mt-1">
                       {edu.startYear}년 ~ {edu.endYear || "재학 중"}년
                     </Text>
                   </View>
                 </View>
-                <TouchableOpacity onPress={() => handleRemoveEducation(edu._id)} className="p-1">
+                <TouchableOpacity
+                  onPress={() => handleRemoveEducation(edu._id)}
+                  className="p-1"
+                >
                   <Ionicons name="trash-outline" size={16} color="#f87171" />
                 </TouchableOpacity>
               </View>
@@ -353,8 +438,10 @@ export default function MyProfile() {
 
       {/* 5. Skills Section */}
       <View className="bg-[#242526] p-5 mt-3">
-        <Text className="text-white font-bold text-base mb-3">기술 및 역량</Text>
-        <View className="flex-row space-x-2 mb-3">
+        <Text className="mb-3 text-base font-bold text-white">
+          기술 및 역량
+        </Text>
+        <View className="flex-row mb-3 space-x-2">
           <TextInput
             value={newSkill}
             onChangeText={setNewSkill}
@@ -362,17 +449,27 @@ export default function MyProfile() {
             placeholderTextColor="#808080"
             className="flex-1 bg-[#3a3b3c] text-white px-3 py-2 rounded-lg text-xs"
           />
-          <TouchableOpacity onPress={handleAddSkill} className="bg-[#0a66c2] px-4 py-2 rounded-lg justify-center">
-            <Text className="text-white text-xs font-semibold">추가</Text>
+          <TouchableOpacity
+            onPress={handleAddSkill}
+            className="bg-[#0a66c2] px-4 py-2 rounded-lg justify-center"
+          >
+            <Text className="text-xs font-semibold text-white">추가</Text>
           </TouchableOpacity>
         </View>
         {profile?.skills?.length === 0 ? (
-          <Text className="text-gray-500 text-xs py-2">등록된 기술이 없습니다.</Text>
+          <Text className="py-2 text-xs text-gray-500">
+            등록된 기술이 없습니다.
+          </Text>
         ) : (
           <View className="flex-row flex-wrap gap-2">
             {profile?.skills.map((skill: string, index: number) => (
-              <View key={index} className="flex-row items-center bg-[#3a3b3c] px-3 py-1.5 rounded-full border border-gray-600 mb-1.5">
-                <Text className="text-gray-200 text-xs font-medium mr-1.5">{skill}</Text>
+              <View
+                key={index}
+                className="flex-row items-center bg-[#3a3b3c] px-3 py-1.5 rounded-full border border-gray-600 mb-1.5"
+              >
+                <Text className="text-gray-200 text-xs font-medium mr-1.5">
+                  {skill}
+                </Text>
                 <TouchableOpacity onPress={() => handleRemoveSkill(skill)}>
                   <Ionicons name="close-circle" size={14} color="#f87171" />
                 </TouchableOpacity>
@@ -388,9 +485,11 @@ export default function MyProfile() {
 
       {/* A. Info Modal (Name, Headline, Location) */}
       <Modal visible={isInfoModalOpen} animationType="fade" transparent>
-        <View className="flex-1 justify-center items-center bg-black/60 px-4">
+        <View className="items-center justify-center flex-1 px-4 bg-black/60">
           <View className="bg-[#242526] border border-[#3a3b3c] w-full max-w-sm rounded-2xl p-5 shadow-2xl">
-            <Text className="text-white font-bold text-lg mb-4">기본 정보 수정</Text>
+            <Text className="mb-4 text-lg font-bold text-white">
+              기본 정보 수정
+            </Text>
             <View className="space-y-3">
               <View>
                 <Text className="text-gray-400 text-xs mb-1.5">이름</Text>
@@ -404,7 +503,9 @@ export default function MyProfile() {
                 <Text className="text-gray-400 text-xs mb-1.5">헤드라인</Text>
                 <TextInput
                   value={infoForm.headline}
-                  onChangeText={(t) => setInfoForm({ ...infoForm, headline: t })}
+                  onChangeText={(t) =>
+                    setInfoForm({ ...infoForm, headline: t })
+                  }
                   className="bg-[#3a3b3c] text-white px-3 py-2.5 rounded-lg text-sm"
                 />
               </View>
@@ -412,21 +513,30 @@ export default function MyProfile() {
                 <Text className="text-gray-400 text-xs mb-1.5">위치</Text>
                 <TextInput
                   value={infoForm.location}
-                  onChangeText={(t) => setInfoForm({ ...infoForm, location: t })}
+                  onChangeText={(t) =>
+                    setInfoForm({ ...infoForm, location: t })
+                  }
                   className="bg-[#3a3b3c] text-white px-3 py-2.5 rounded-lg text-sm"
                 />
               </View>
             </View>
-            <View className="flex-row justify-end space-x-2 mt-5">
-              <TouchableOpacity onPress={() => setIsInfoModalOpen(false)} className="bg-[#3a3b3c] px-4 py-2 rounded-lg">
-                <Text className="text-gray-300 text-xs font-semibold">취소</Text>
+            <View className="flex-row justify-end mt-5 space-x-3">
+              <TouchableOpacity
+                onPress={() => setIsInfoModalOpen(false)}
+                className="bg-[#3a3b3c] px-4 py-2 rounded-lg"
+              >
+                <Text className="text-xs font-semibold text-gray-300">
+                  취소
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => updateProfile(infoForm)}
                 disabled={isUpdating}
                 className="bg-[#0a66c2] px-4 py-2 rounded-lg"
               >
-                <Text className="text-white text-xs font-semibold">저장</Text>
+                <Text className="ml-4 text-xs font-semibold text-white">
+                  저장
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -435,9 +545,9 @@ export default function MyProfile() {
 
       {/* B. About Modal */}
       <Modal visible={isAboutModalOpen} animationType="fade" transparent>
-        <View className="flex-1 justify-center items-center bg-black/60 px-4">
+        <View className="items-center justify-center flex-1 px-4 bg-black/60">
           <View className="bg-[#242526] border border-[#3a3b3c] w-full max-w-sm rounded-2xl p-5 shadow-2xl">
-            <Text className="text-white font-bold text-lg mb-4">소개 수정</Text>
+            <Text className="mb-4 text-lg font-bold text-white">소개 수정</Text>
             <TextInput
               multiline
               numberOfLines={6}
@@ -446,16 +556,21 @@ export default function MyProfile() {
               className="bg-[#3a3b3c] text-white px-3 py-2.5 rounded-lg text-sm h-32 text-left align-top"
               style={{ textAlignVertical: "top" }}
             />
-            <View className="flex-row justify-end space-x-2 mt-5">
-              <TouchableOpacity onPress={() => setIsAboutModalOpen(false)} className="bg-[#3a3b3c] px-4 py-2 rounded-lg">
-                <Text className="text-gray-300 text-xs font-semibold">취소</Text>
+            <View className="flex-row justify-end mt-5 space-x-8">
+              <TouchableOpacity
+                onPress={() => setIsAboutModalOpen(false)}
+                className="bg-[#3a3b3c] px-4 py-2 rounded-lg"
+              >
+                <Text className="text-xs font-semibold text-gray-300">
+                  취소
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => updateProfile({ about: aboutForm })}
                 disabled={isUpdating}
                 className="bg-[#0a66c2] px-4 py-2 rounded-lg"
               >
-                <Text className="text-white text-xs font-semibold">저장</Text>
+                <Text className="text-xs font-semibold text-white">저장</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -464,9 +579,9 @@ export default function MyProfile() {
 
       {/* C. Experience Modal */}
       <Modal visible={isExpModalOpen} animationType="fade" transparent>
-        <View className="flex-1 justify-center items-center bg-black/60 px-4">
+        <View className="items-center justify-center flex-1 px-4 bg-black/60">
           <View className="bg-[#242526] border border-[#3a3b3c] w-full max-w-sm rounded-2xl p-5 shadow-2xl">
-            <Text className="text-white font-bold text-lg mb-4">경력 추가</Text>
+            <Text className="mb-4 text-lg font-bold text-white">경력 추가</Text>
             <View className="space-y-3">
               <TextInput
                 placeholder="직무 (Title)"
@@ -507,12 +622,20 @@ export default function MyProfile() {
                 style={{ textAlignVertical: "top" }}
               />
             </View>
-            <View className="flex-row justify-end space-x-2 mt-5">
-              <TouchableOpacity onPress={() => setIsExpModalOpen(false)} className="bg-[#3a3b3c] px-4 py-2 rounded-lg">
-                <Text className="text-gray-300 text-xs font-semibold">취소</Text>
+            <View className="flex-row justify-end mt-5 space-x-8">
+              <TouchableOpacity
+                onPress={() => setIsExpModalOpen(false)}
+                className="bg-[#3a3b3c] px-4 py-2 rounded-lg"
+              >
+                <Text className="text-xs font-semibold text-gray-300">
+                  취소
+                </Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={handleAddExperience} className="bg-[#0a66c2] px-4 py-2 rounded-lg">
-                <Text className="text-white text-xs font-semibold">추가</Text>
+              <TouchableOpacity
+                onPress={handleAddExperience}
+                className="bg-[#0a66c2] px-4 py-2 rounded-lg"
+              >
+                <Text className="text-xs font-semibold text-white">추가</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -521,9 +644,9 @@ export default function MyProfile() {
 
       {/* D. Education Modal */}
       <Modal visible={isEduModalOpen} animationType="fade" transparent>
-        <View className="flex-1 justify-center items-center bg-black/60 px-4">
+        <View className="items-center justify-center flex-1 px-4 bg-black/60">
           <View className="bg-[#242526] border border-[#3a3b3c] w-full max-w-sm rounded-2xl p-5 shadow-2xl">
-            <Text className="text-white font-bold text-lg mb-4">학력 추가</Text>
+            <Text className="mb-4 text-lg font-bold text-white">학력 추가</Text>
             <View className="space-y-3">
               <TextInput
                 placeholder="학교명"
@@ -536,7 +659,9 @@ export default function MyProfile() {
                 placeholder="전공 및 학과"
                 placeholderTextColor="#808080"
                 value={eduForm.fieldOfStudy}
-                onChangeText={(t) => setEduForm({ ...eduForm, fieldOfStudy: t })}
+                onChangeText={(t) =>
+                  setEduForm({ ...eduForm, fieldOfStudy: t })
+                }
                 className="bg-[#3a3b3c] text-white px-3 py-2.5 rounded-lg text-sm mt-3"
               />
               <TextInput
@@ -554,12 +679,20 @@ export default function MyProfile() {
                 className="bg-[#3a3b3c] text-white px-3 py-2.5 rounded-lg text-sm mt-3"
               />
             </View>
-            <View className="flex-row justify-end space-x-2 mt-5">
-              <TouchableOpacity onPress={() => setIsEduModalOpen(false)} className="bg-[#3a3b3c] px-4 py-2 rounded-lg">
-                <Text className="text-gray-300 text-xs font-semibold">취소</Text>
+            <View className="flex-row justify-end mt-5 space-x-8">
+              <TouchableOpacity
+                onPress={() => setIsEduModalOpen(false)}
+                className="bg-[#3a3b3c] px-4 py-2 rounded-lg"
+              >
+                <Text className="text-xs font-semibold text-gray-300">
+                  취소
+                </Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={handleAddEducation} className="bg-[#0a66c2] px-4 py-2 rounded-lg">
-                <Text className="text-white text-xs font-semibold">추가</Text>
+              <TouchableOpacity
+                onPress={handleAddEducation}
+                className="bg-[#0a66c2] px-4 py-2 rounded-lg"
+              >
+                <Text className="text-xs font-semibold text-white">추가</Text>
               </TouchableOpacity>
             </View>
           </View>

@@ -1,7 +1,21 @@
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useQuery } from "@tanstack/react-query";
+import { customFetch } from "../../lib/api";
 
 export default function TabsLayout() {
+  const { data: connectionRequests } = useQuery({
+    queryKey: ["connectionRequests"],
+    queryFn: async () => {
+      const res = await customFetch("/connection/requests");
+      if (!res.ok) return [];
+      return res.json();
+    },
+    refetchInterval: 15000, // 15초마다 1촌 요청 수량 갱신하여 탭 배지 최신화
+  });
+
+  const requestCount = connectionRequests?.length || 0;
+
   return (
     <Tabs
       screenOptions={{
@@ -43,6 +57,13 @@ export default function TabsLayout() {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="people" size={size} color={color} />
           ),
+          tabBarBadge: requestCount > 0 ? requestCount : undefined,
+          tabBarBadgeStyle: {
+            backgroundColor: "#e11d48",
+            color: "white",
+            fontSize: 10,
+            lineHeight: 14,
+          },
         }}
       />
       <Tabs.Screen

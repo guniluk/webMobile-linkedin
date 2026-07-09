@@ -1,5 +1,5 @@
-import { useCallback } from "react";
-import { View, Text, ScrollView, TouchableOpacity, Alert } from "react-native";
+import { useState, useCallback } from "react";
+import { View, Text, ScrollView, TouchableOpacity, Alert, RefreshControl } from "react-native";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter, useFocusEffect } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -10,9 +10,10 @@ import LoadingSpinner from "../../components/LoadingSpinner";
 export default function Network() {
   const queryClient = useQueryClient();
   const router = useRouter();
+  const [refreshing, setRefreshing] = useState(false);
 
   // 1. Fetch My Connections
-  const { data: connections, isLoading: isConnLoading } = useQuery({
+  const { data: connections, isLoading: isConnLoading, refetch: refetchConnections } = useQuery({
     queryKey: ["connections"],
     queryFn: async () => {
       const res = await customFetch("/connection");
@@ -22,17 +23,18 @@ export default function Network() {
   });
 
   // 2. Fetch Connection Requests (Incoming)
-  const { data: connectionRequests, isLoading: isRequestsLoading } = useQuery({
+  const { data: connectionRequests, isLoading: isRequestsLoading, refetch: refetchRequests } = useQuery({
     queryKey: ["connectionRequests"],
     queryFn: async () => {
       const res = await customFetch("/connection/requests");
       if (!res.ok) throw new Error("1촌 요청을 가져오는데 실패했습니다.");
       return res.json();
     },
+    refetchInterval: 10000, // 10초마다 자동으로 1촌 요청 목록 새로고침
   });
 
   // 3. Fetch Suggested Connections
-  const { data: suggestedUsers, isLoading: isSuggestionsLoading } = useQuery({
+  const { data: suggestedUsers, isLoading: isSuggestionsLoading, refetch: refetchSuggestions } = useQuery({
     queryKey: ["suggestedConnections"],
     queryFn: async () => {
       const res = await customFetch("/user/suggestions");
@@ -40,6 +42,16 @@ export default function Network() {
       return res.json();
     },
   });
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await Promise.all([
+      refetchConnections(),
+      refetchRequests(),
+      refetchSuggestions(),
+    ]);
+    setRefreshing(false);
+  };
 
   useFocusEffect(
     useCallback(() => {
@@ -128,6 +140,14 @@ export default function Network() {
     <ScrollView
       className="flex-1 bg-[#18191a]"
       contentContainerStyle={{ paddingBottom: 30 }}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          tintColor="#0a66c2"
+          colors={["#0a66c2"]}
+        />
+      }
     >
       {/* 1. Connection Requests Section */}
       {connectionRequests && connectionRequests.length > 0 && (

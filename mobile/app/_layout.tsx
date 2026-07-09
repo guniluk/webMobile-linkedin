@@ -1,10 +1,17 @@
 import { useEffect } from "react";
-import { Stack, useRouter, useSegments, useRootNavigationState } from "expo-router";
+import {
+  Stack,
+  useRouter,
+  useSegments,
+  useRootNavigationState,
+} from "expo-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useAuthStore } from "../store/authStore";
 import { ActivityIndicator, View } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import "../global.css";
+
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 const queryClient = new QueryClient();
 
@@ -40,12 +47,16 @@ export default function RootLayout() {
   const hasHydrated = useAuthStore((state) => state.hasHydrated);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <StatusBar style="light" />
-      <AuthProtection />
+    <SafeAreaProvider>
+      <QueryClientProvider client={queryClient}>
+        <StatusBar style="light" />
+        <AuthProtection />
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false, headerBackTitle: "Back" }} />
+        <Stack.Screen
+          name="(tabs)"
+          options={{ headerShown: false, headerBackTitle: "Back" }}
+        />
         <Stack.Screen
           name="profile/[username]"
           options={{
@@ -90,11 +101,23 @@ export default function RootLayout() {
       </Stack>
 
       {!hasHydrated && (
-        <View style={{ position: "absolute", top: 0, bottom: 0, left: 0, right: 0, justifyContent: "center", alignItems: "center", backgroundColor: "#18191a", zIndex: 999 }}>
+        <View
+          style={{
+            position: "absolute",
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0,
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "#18191a",
+            zIndex: 999,
+          }}
+        >
           <ActivityIndicator size="large" color="#0a66c2" />
         </View>
       )}
     </QueryClientProvider>
+    </SafeAreaProvider>
   );
 }
-

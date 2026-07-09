@@ -1,5 +1,16 @@
 import { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Modal, Alert, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ActivityIndicator,
+  Modal,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+} from "react-native";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
@@ -14,7 +25,11 @@ interface PostCreationModalProps {
   user: any;
 }
 
-export default function PostCreationModal({ visible, onClose, user }: PostCreationModalProps) {
+export default function PostCreationModal({
+  visible,
+  onClose,
+  user,
+}: PostCreationModalProps) {
   const [content, setContent] = useState("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const queryClient = useQueryClient();
@@ -73,7 +88,13 @@ export default function PostCreationModal({ visible, onClose, user }: PostCreati
   };
 
   return (
-    <Modal visible={visible} animationType="slide" transparent={false}>
+    <Modal
+      visible={visible}
+      animationType="slide"
+      transparent={false}
+      presentationStyle="pageSheet"
+      onRequestClose={onClose}
+    >
       <SafeAreaView className="flex-1 bg-[#1c1d1f]" edges={["top", "bottom"]}>
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -81,10 +102,10 @@ export default function PostCreationModal({ visible, onClose, user }: PostCreati
         >
           {/* Header */}
           <View className="flex-row justify-between items-center px-4 py-4 border-b border-[#2d2e30] bg-[#1c1d1f]">
-            <TouchableOpacity onPress={onClose} className="py-1 px-2">
-              <Text className="text-gray-400 text-base font-medium">취소</Text>
+            <TouchableOpacity onPress={onClose} className="px-2 py-1">
+              <Text className="text-base font-medium text-gray-400">취소</Text>
             </TouchableOpacity>
-            <Text className="text-white font-bold text-lg">게시물 작성</Text>
+            <Text className="text-lg font-bold text-white">게시물 작성</Text>
             <TouchableOpacity
               onPress={handleSubmit}
               disabled={isPending || (!content.trim() && !imagePreview)}
@@ -93,21 +114,32 @@ export default function PostCreationModal({ visible, onClose, user }: PostCreati
               {isPending ? (
                 <ActivityIndicator size="small" color="white" />
               ) : (
-                <Text className="text-white font-bold text-sm">게시</Text>
+                <Text className="text-sm font-bold text-white">게시</Text>
               )}
             </TouchableOpacity>
           </View>
 
-          <ScrollView className="flex-1 px-5 pt-5" keyboardShouldPersistTaps="handled">
+          <ScrollView
+            className="flex-1 px-5 pt-5"
+            keyboardShouldPersistTaps="handled"
+          >
             {/* User Info & Visibility Badge */}
             <View className="flex-row items-center mb-6">
-              <Avatar user={user} size={48} className="mr-8 border border-gray-600" />
-              <View>
-                <Text className="text-white font-extrabold text-base">{user?.name}</Text>
+              <Avatar
+                user={user}
+                size={48}
+                className="mr-8 border border-gray-600"
+              />
+              <View className="ml-5">
+                <Text className="text-base font-extrabold text-white">
+                  {user?.name}
+                </Text>
                 {/* Visibility Badge */}
                 <TouchableOpacity className="flex-row items-center bg-[#2d2e30] px-2.5 py-1 rounded-full mt-1 border border-gray-600/40">
                   <Ionicons name="earth" size={12} color="#808080" />
-                  <Text className="text-gray-300 text-[10px] font-bold mx-1">누구나 공개</Text>
+                  <Text className="text-gray-300 text-[10px] font-bold mx-1">
+                    누구나 공개
+                  </Text>
                   <Ionicons name="chevron-down" size={10} color="#808080" />
                 </TouchableOpacity>
               </View>
@@ -127,10 +159,14 @@ export default function PostCreationModal({ visible, onClose, user }: PostCreati
             {/* Image Preview */}
             {imagePreview && (
               <View className="relative mt-4 rounded-2xl overflow-hidden border border-[#2d2e30] bg-black mb-8">
-                <Image source={imagePreview} style={{ width: "100%", height: 260 }} contentFit="contain" />
+                <Image
+                  source={imagePreview}
+                  style={{ width: "100%", height: 260 }}
+                  contentFit="contain"
+                />
                 <TouchableOpacity
                   onPress={handleRemoveImage}
-                  className="absolute top-3 right-3 bg-black/70 p-2 rounded-full border border-gray-600"
+                  className="absolute p-2 border border-gray-600 rounded-full top-3 right-3 bg-black/70"
                 >
                   <Ionicons name="close" size={16} color="white" />
                 </TouchableOpacity>
@@ -140,7 +176,9 @@ export default function PostCreationModal({ visible, onClose, user }: PostCreati
 
           {/* Premium Bottom Toolbar */}
           <View className="border-t border-[#2d2e30] p-4 bg-[#242526]">
-            <Text className="text-gray-400 text-xs font-semibold mb-3">게시물에 추가</Text>
+            <Text className="mb-3 text-xs font-semibold text-gray-400">
+              게시물에 추가
+            </Text>
             <View className="flex-row items-center justify-between">
               {/* Media Button */}
               <TouchableOpacity
@@ -148,7 +186,9 @@ export default function PostCreationModal({ visible, onClose, user }: PostCreati
                 className="flex-row items-center space-x-2 bg-[#2d2e30] px-4 py-2.5 rounded-full border border-gray-600/50"
               >
                 <Ionicons name="image-outline" size={20} color="#0a66c2" />
-                <Text className="text-gray-200 text-sm font-semibold">사진</Text>
+                <Text className="text-sm font-semibold text-gray-200">
+                  사진
+                </Text>
               </TouchableOpacity>
 
               {/* Extra Dummy Icons for Design Completeness */}
@@ -160,10 +200,18 @@ export default function PostCreationModal({ visible, onClose, user }: PostCreati
                   <Ionicons name="videocam-outline" size={20} color="#808080" />
                 </TouchableOpacity>
                 <TouchableOpacity className="p-2 bg-[#2d2e30] rounded-full border border-gray-600/30">
-                  <Ionicons name="bar-chart-outline" size={20} color="#808080" />
+                  <Ionicons
+                    name="bar-chart-outline"
+                    size={20}
+                    color="#808080"
+                  />
                 </TouchableOpacity>
                 <TouchableOpacity className="p-2 bg-[#2d2e30] rounded-full border border-gray-600/30">
-                  <Ionicons name="ellipsis-horizontal-outline" size={20} color="#808080" />
+                  <Ionicons
+                    name="ellipsis-horizontal-outline"
+                    size={20}
+                    color="#808080"
+                  />
                 </TouchableOpacity>
               </View>
             </View>

@@ -12,7 +12,15 @@ export const getFeedPosts = async (req, res) => {
     })
       .populate("author", "name username profilePicture headline")
       .populate("comments.user", "name profilePicture")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
+
+    posts.forEach((post) => {
+      if (post.comments && post.comments.length > 0) {
+        post.comments.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      }
+    });
+
     res.status(200).json(posts);
   } catch (error) {
     console.log("get feed posts error:", error);
@@ -95,7 +103,13 @@ export const getPostById = async (req, res) => {
     if (!post) {
       return res.status(404).json({ message: "Post not found" });
     }
-    res.status(200).json(post);
+
+    const postObj = post.toObject();
+    if (postObj.comments && postObj.comments.length > 0) {
+      postObj.comments.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    }
+
+    res.status(200).json(postObj);
   } catch (error) {
     console.log("get post by id error:", error);
     res.status(500).json({ message: "Failed to get post by id", error });
@@ -150,7 +164,12 @@ export const createComment = async (req, res) => {
       }
     }
 
-    res.status(200).json(updatedPost);
+    const postObj = updatedPost.toObject();
+    if (postObj.comments && postObj.comments.length > 0) {
+      postObj.comments.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    }
+
+    res.status(200).json(postObj);
   } catch (error) {
     console.log("create comment error:", error);
     res.status(500).json({ message: "Failed to create comment", error });
@@ -249,7 +268,12 @@ export const deleteComment = async (req, res) => {
       .populate("author", "name username profilePicture headline")
       .populate("comments.user", "name profilePicture");
 
-    res.status(200).json(updatedPost);
+    const postObj = updatedPost.toObject();
+    if (postObj.comments && postObj.comments.length > 0) {
+      postObj.comments.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    }
+
+    res.status(200).json(postObj);
   } catch (error) {
     console.log("delete comment error:", error);
     res.status(500).json({ message: "Failed to delete comment", error });

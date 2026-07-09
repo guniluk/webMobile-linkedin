@@ -1,5 +1,14 @@
 import { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+} from "react-native";
 import { useRouter } from "expo-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { customFetch } from "../../lib/api";
@@ -43,7 +52,12 @@ export default function Signup() {
   const handleSignup = () => {
     setErrorMsg("");
 
-    if (!formData.name || !formData.username || !formData.email || !formData.password) {
+    if (
+      !formData.name ||
+      !formData.username ||
+      !formData.email ||
+      !formData.password
+    ) {
       setErrorMsg("모든 필드를 입력해 주세요.");
       return;
     }
@@ -65,70 +79,99 @@ export default function Signup() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       className="flex-1 bg-[#18191a]"
     >
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
-        <View className="flex-1 justify-center px-6 py-12">
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View className="justify-center flex-1 px-6 py-12">
           {/* Logo & Header */}
           <View className="items-center mb-8">
             <Ionicons name="logo-linkedin" size={64} color="#0a66c2" />
-            <Text className="text-3xl font-bold text-white mt-4">LinkedIn 가입하기</Text>
-            <Text className="text-base text-gray-400 mt-1">커리어를 쌓기 위한 첫 단계</Text>
+            <Text className="mt-4 text-3xl font-bold text-white">
+              LinkedIn 가입하기
+            </Text>
+            <Text className="mt-1 text-base text-gray-400">
+              커리어를 쌓기 위한 첫 단계
+            </Text>
           </View>
 
           {/* Form Card */}
           <View className="bg-[#242526] p-6 rounded-2xl shadow-lg border border-[#3a3b3c] space-y-4">
             <View>
-              <Text className="text-sm font-medium text-gray-300 mb-2">이름</Text>
+              <Text className="mb-2 text-sm font-medium text-gray-300">
+                이름
+              </Text>
               <TextInput
                 className="w-full bg-[#3a3b3c] text-white px-4 py-3 rounded-lg border border-transparent focus:border-[#0a66c2] text-base"
                 placeholder="홍길동"
+                autoCapitalize="none"
                 placeholderTextColor="#b0b3b8"
                 value={formData.name}
-                onChangeText={(text) => setFormData({ ...formData, name: text })}
+                onChangeText={(text) =>
+                  setFormData({ ...formData, name: text })
+                }
               />
             </View>
 
             <View className="mt-3">
-              <Text className="text-sm font-medium text-gray-300 mb-2">사용자 아이디 (username)</Text>
+              <Text className="mb-2 text-sm font-medium text-gray-300">
+                사용자 아이디 (username)
+              </Text>
               <TextInput
                 className="w-full bg-[#3a3b3c] text-white px-4 py-3 rounded-lg border border-transparent focus:border-[#0a66c2] text-base"
                 placeholder="yourusername"
                 placeholderTextColor="#b0b3b8"
                 value={formData.username}
-                onChangeText={(text) => setFormData({ ...formData, username: text })}
+                onChangeText={(text) =>
+                  setFormData({ ...formData, username: text })
+                }
                 autoCapitalize="none"
               />
             </View>
 
             <View className="mt-3">
-              <Text className="text-sm font-medium text-gray-300 mb-2">이메일 주소</Text>
+              <Text className="mb-2 text-sm font-medium text-gray-300">
+                이메일 주소
+              </Text>
               <TextInput
                 className="w-full bg-[#3a3b3c] text-white px-4 py-3 rounded-lg border border-transparent focus:border-[#0a66c2] text-base"
                 placeholder="username@example.com"
                 placeholderTextColor="#b0b3b8"
                 value={formData.email}
-                onChangeText={(text) => setFormData({ ...formData, email: text })}
+                onChangeText={(text) =>
+                  setFormData({ ...formData, email: text })
+                }
                 keyboardType="email-address"
                 autoCapitalize="none"
               />
             </View>
 
             <View className="mt-3">
-              <Text className="text-sm font-medium text-gray-300 mb-2">비밀번호 (6자 이상)</Text>
+              <Text className="mb-2 text-sm font-medium text-gray-300">
+                비밀번호 (6자 이상)
+              </Text>
               <TextInput
                 className="w-full bg-[#3a3b3c] text-white px-4 py-3 rounded-lg border border-transparent focus:border-[#0a66c2] text-base"
                 placeholder="••••••••"
                 placeholderTextColor="#b0b3b8"
                 secureTextEntry
                 value={formData.password}
-                onChangeText={(text) => setFormData({ ...formData, password: text })}
+                onChangeText={(text) =>
+                  setFormData({ ...formData, password: text })
+                }
                 autoCapitalize="none"
               />
             </View>
 
             {errorMsg ? (
-              <View className="mt-4 bg-red-950/30 border border-red-900/50 p-3 rounded-lg flex-row items-center">
-                <Ionicons name="alert-circle" size={20} color="#f87171" style={{ marginRight: 8 }} />
-                <Text className="text-red-400 text-sm flex-1">{errorMsg}</Text>
+              <View className="flex-row items-center p-3 mt-4 border rounded-lg bg-red-950/30 border-red-900/50">
+                <Ionicons
+                  name="alert-circle"
+                  size={20}
+                  color="#f87171"
+                  style={{ marginRight: 8 }}
+                />
+                <Text className="flex-1 text-sm text-red-400">{errorMsg}</Text>
               </View>
             ) : null}
 
@@ -140,16 +183,22 @@ export default function Signup() {
               {isPending ? (
                 <ActivityIndicator color="white" />
               ) : (
-                <Text className="text-white font-semibold text-base">동의 및 가입하기</Text>
+                <Text className="text-base font-semibold text-white">
+                  동의 및 가입하기
+                </Text>
               )}
             </TouchableOpacity>
           </View>
 
           {/* Footer Link */}
           <View className="flex-row justify-center mt-8">
-            <Text className="text-gray-400 text-sm">이미 계정이 있으신가요? </Text>
+            <Text className="text-sm text-gray-400">
+              이미 계정이 있으신가요?{" "}
+            </Text>
             <TouchableOpacity onPress={() => router.push("/(auth)/login")}>
-              <Text className="text-[#0a66c2] font-semibold text-sm">로그인</Text>
+              <Text className="text-[#0a66c2] font-semibold text-sm">
+                로그인
+              </Text>
             </TouchableOpacity>
           </View>
         </View>

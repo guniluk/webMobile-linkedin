@@ -11,10 +11,13 @@ export default function Notifications() {
   const queryClient = useQueryClient();
   const router = useRouter();
 
-
-
   // 2. Fetch Notifications
-  const { data: notifications, isLoading, refetch: refetchNotifications, isRefetching } = useQuery({
+  const {
+    data: notifications,
+    isLoading,
+    refetch: refetchNotifications,
+    isRefetching,
+  } = useQuery({
     queryKey: ["notifications"],
     queryFn: async () => {
       const res = await customFetch("/notification");
@@ -26,7 +29,7 @@ export default function Notifications() {
   useFocusEffect(
     useCallback(() => {
       refetchNotifications();
-    }, [refetchNotifications])
+    }, [refetchNotifications]),
   );
 
   // 3. Mark as Read Mutation
@@ -78,13 +81,13 @@ export default function Notifications() {
         );
       case "comment":
         return (
-          <View className="bg-emerald-500/10 p-2 rounded-full border border-emerald-500/20">
+          <View className="p-2 border rounded-full bg-emerald-500/10 border-emerald-500/20">
             <Ionicons name="chatbubble" size={18} color="#10b981" />
           </View>
         );
       case "connectionAccepted":
         return (
-          <View className="bg-purple-500/10 p-2 rounded-full border border-purple-500/20">
+          <View className="p-2 border rounded-full bg-purple-500/10 border-purple-500/20">
             <Ionicons name="person-add" size={18} color="#a855f7" />
           </View>
         );
@@ -115,7 +118,7 @@ export default function Notifications() {
     <View className="flex-1 bg-[#18191a]">
       {/* Header Info */}
       <View className="bg-[#242526] px-4 py-3 border-b border-[#3a3b3c] flex-row justify-between items-center">
-        <Text className="text-gray-400 text-xs">
+        <Text className="text-xs text-gray-400">
           미확인 알림 {notifications?.filter((n: any) => !n.read).length || 0}개
         </Text>
       </View>
@@ -124,10 +127,16 @@ export default function Notifications() {
       {isLoading ? (
         <LoadingSpinner />
       ) : notifications?.length === 0 ? (
-        <View className="flex-1 justify-center items-center p-6 text-center">
-          <Ionicons name="notifications-off-outline" size={64} color="#505050" />
-          <Text className="text-white font-bold text-lg mt-3">알림이 없습니다</Text>
-          <Text className="text-gray-400 text-xs text-center mt-1">
+        <View className="items-center justify-center flex-1 p-6 text-center">
+          <Ionicons
+            name="notifications-off-outline"
+            size={64}
+            color="#505050"
+          />
+          <Text className="mt-3 text-lg font-bold text-white">
+            알림이 없습니다
+          </Text>
+          <Text className="mt-1 text-xs text-center text-gray-400">
             아직 새로운 활동이나 1촌 소식이 없습니다.
           </Text>
         </View>
@@ -141,19 +150,26 @@ export default function Notifications() {
             <TouchableOpacity
               onPress={() => handleNotificationClick(item)}
               className={`flex-row items-center justify-between p-4 border-b border-[#3a3b3c]/50 ${
-                item.read ? "bg-transparent" : "bg-[#0a66c2]/5 border-l-4 border-[#0a66c2]"
+                item.read
+                  ? "bg-transparent"
+                  : "bg-[#0a66c2]/5 border-l-4 border-[#0a66c2]"
               }`}
             >
               <View className="flex-row items-center flex-1 min-w-0 mr-2">
                 {getNotificationIcon(item.type)}
                 <TouchableOpacity
-                  onPress={() => router.push(`/profile/${item.relatedUser?.username}`)}
+                  onPress={() =>
+                    router.push(`/profile/${item.relatedUser?.username}`)
+                  }
                   className="ml-3 mr-8"
                 >
                   <Avatar user={item.relatedUser} size={40} />
                 </TouchableOpacity>
                 <View className="flex-1 min-w-0">
-                  <Text className="text-gray-200 text-xs leading-relaxed" numberOfLines={2}>
+                  <Text
+                    className="text-xs leading-relaxed text-gray-200"
+                    numberOfLines={2}
+                  >
                     {getNotificationText(item)}
                   </Text>
                   <Text className="text-gray-500 text-[9px] mt-1 font-medium">
@@ -162,13 +178,19 @@ export default function Notifications() {
                 </View>
               </View>
 
-              <View className="flex-row space-x-1 items-center">
+              <View className="flex-row items-center space-x-1">
                 {item.relatedPost && (
-                  <TouchableOpacity onPress={() => handleNotificationClick(item)} className="p-1.5">
+                  <TouchableOpacity
+                    onPress={() => handleNotificationClick(item)}
+                    className="p-1.5"
+                  >
                     <Ionicons name="eye-outline" size={16} color="#a0a0a0" />
                   </TouchableOpacity>
                 )}
-                <TouchableOpacity onPress={() => deleteNotification(item._id)} className="p-1.5">
+                <TouchableOpacity
+                  onPress={() => deleteNotification(item._id)}
+                  className="p-1.5"
+                >
                   <Ionicons name="trash-outline" size={16} color="#f87171" />
                 </TouchableOpacity>
               </View>
